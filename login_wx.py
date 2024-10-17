@@ -17,7 +17,18 @@ from config import conigs
 from logs import config_log
 from tqdm import tqdm
 from datetime import datetime
+from PIL import Image  
+import pyperclip
+import io  
+  
+def image_to_clipboard(image_path):  
+    img = Image.open('/Users/liqian/Documents/wireshark.jpeg')
+    image_data = img.tobytes()
+    pyperclip.copy(image_data)
 
+  
+# 使用函数  
+image_to_clipboard('/path/to/your/image.png')
 def delete_all_files(folder_path):
     # 获取文件夹中所有文件的列表
     try:
@@ -61,7 +72,7 @@ class wx():
 
 
 class login_wx(wx):
-    def __init__(self, timeout: int, cookie_file: str):
+    def __init__(self, timeout: int, cookie_file: str, dialog_file: str = None):
         super(login_wx, self).__init__()
         """
         初始化
@@ -70,10 +81,17 @@ class login_wx(wx):
         """
         self.timeout = timeout * 1000
         self.cookie_file = cookie_file
-
+        self.dialog_file = dialog_file
+        self.dialog = {
+            'title':'1211212',
+            'author':'222',
+            'content':'fffegewqgeq',
+        }
+        
     async def login(self) -> None:
+        image_to_clipboard('')
         async with async_playwright() as playwright:
-            browser = await self.playwright_init(playwright)
+            browser = await self.playwright_init(playwright,False)
             context = await browser.new_context(storage_state=self.cookie_file, user_agent=self.ua["web"])
             page = await context.new_page()
             await page.add_init_script(path="stealth.min.js")
@@ -84,7 +102,55 @@ class login_wx(wx):
                 logging.info("账号未登录")
                 return
             print("账号已登录")
+            # 使用text()选择器查找包含"图文消息"文字的div元素  
+            element = await page.query_selector('//*[@id="app"]/div[2]/div[3]/div[2]/div/div[2]')  
+            await element.click()
 
+            # 监听新页面打开事件（异步方式）  
+            async with page.expect_event('popup') as event_info:  
+                new_page = await event_info.value  # 在这里，value 是可用的，因为它是异步上下文管理器的结果  
+
+            # 填写标题
+            await new_page.click('//*[@id="title"]')  # 使用正确的ID选择器  
+            await new_page.keyboard.type(self.dialog['title'])
+            # 填写作者
+            await new_page.keyboard.press('Tab')  
+            await new_page.keyboard.type(self.dialog['author'])
+            # 填写正文
+            await new_page.keyboard.press('Tab')  
+            img_data = pyperclip.paste()
+            image = io.BytesIO(img_data)  
+            await new_page.keyboard.type(image)
+            await new_page.keyboard.type(self.dialog['content'])
+            # 选择第一张图片做封面
+            pic = await new_page.query_selector('//*[@id="js_cover_area"]/div[1]')
+            await pic.hover()
+            new_page.wait_for_timeout(500)  
+            pick_from_article = await new_page.query_selector('//*[@id="js_cover_null"]/ul/li[1]/a')
+            await pick_from_article.click()
+            new_page.wait_for_timeout(500)  
+            first_pic = await new_page.query_selector('//*[@id="vue_app"]/div[2]/div[1]/div/div[2]/div[1]/div/ul')
+            await first_pic.click()
+            new_page.wait_for_timeout(500)  
+            next_btn = await new_page.query_selector('//*[@id="vue_app"]/div[2]/div[1]/div/div[3]/div[1]/button')
+            await next_btn.click()
+            new_page.wait_for_timeout(500)
+            finish_btn = await new_page.query_selector('//*[@id="vue_app"]/div[2]/div[1]/div/div[3]/div[2]/button')
+            await finish_btn.click()
+            new_page.wait_for_timeout(500)
+            publish_btn = await new_page.query_selector('//*[@id="js_send"]/button')
+            await publish_btn.click()
+            new_page.wait_for_timeout(500)
+            publish_again = await new_page.query_selector('//*[@id="vue_app"]/div[2]/div[1]/div[1]/div/div[3]/div/div/div[1]/button')
+            await publish_again.click()
+            new_page.wait_for_timeout(500)
+            publish_3 = await new_page.query_selector('//*[@id="vue_app"]/div[2]/div[2]/div[1]/div/div[3]/div/div[1]/button')
+            await publish_3.click()
+            new_page.wait_for_timeout(500)
+
+            time.sleep(10)
+
+            
     async def main(self):
         await self.login()
 
