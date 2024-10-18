@@ -22,8 +22,9 @@ import pyperclip
 import io  
   
 def image_to_clipboard(image_path):  
-    img = Image.open('/Users/liqian/Documents/wireshark.jpeg')
-    image_data = img.tobytes()
+    img = open('/Users/liqian/Documents/wireshark.jpeg','rb')
+    image_data = img.read()
+    img.close()
     pyperclip.copy(image_data)
 
   
@@ -89,7 +90,6 @@ class login_wx(wx):
         }
         
     async def login(self) -> None:
-        image_to_clipboard('')
         async with async_playwright() as playwright:
             browser = await self.playwright_init(playwright,False)
             context = await browser.new_context(storage_state=self.cookie_file, user_agent=self.ua["web"])
@@ -103,7 +103,7 @@ class login_wx(wx):
                 return
             print("账号已登录")
             # 使用text()选择器查找包含"图文消息"文字的div元素  
-            element = await page.query_selector('//*[@id="app"]/div[2]/div[3]/div[2]/div/div[2]')  
+            element = await page.wait_for_selector('//*[@id="app"]/div[2]/div[3]/div[2]/div/div[2]')  
             await element.click()
 
             # 监听新页面打开事件（异步方式）  
@@ -113,42 +113,62 @@ class login_wx(wx):
             # 填写标题
             await new_page.click('//*[@id="title"]')  # 使用正确的ID选择器  
             await new_page.keyboard.type(self.dialog['title'])
+            time.sleep(1)
             # 填写作者
             await new_page.keyboard.press('Tab')  
             await new_page.keyboard.type(self.dialog['author'])
+            time.sleep(1)
             # 填写正文
-            await new_page.keyboard.press('Tab')  
-            img_data = pyperclip.paste()
-            image = io.BytesIO(img_data)  
-            await new_page.keyboard.type(image)
+            await new_page.keyboard.press('Tab') 
+            #   在开头插入图片 
+            pick_pic = await new_page.wait_for_selector('//*[@id="js_editor_insertimage"]')
+            await pick_pic.click()
+            time.sleep(1)
+            pick_from_library = await new_page.wait_for_selector('//*[@id="js_editor_insertimage"]/ul/li[2]')
+            await pick_from_library.click()
+            time.sleep(1)
+            selected_pic = await new_page.wait_for_selector('//*[@id="js_image_dialog_list_wrp"]/div/div[1]')#此处随机生成一个数字
+            await selected_pic.click()
+            time.sleep(1)
+            sure = await new_page.wait_for_selector('//*[@id="vue_app"]/div[2]/div[1]/div/div[3]/div[2]/button')
+            await sure.click()
+            time.sleep(1)
+            #    写入正文  
             await new_page.keyboard.type(self.dialog['content'])
+            time.sleep(1)
+            # 滚动到页面底部  
+            page.evaluate('window.scrollTo(0, document.body.scrollHeight);')  
+  
             # 选择第一张图片做封面
-            pic = await new_page.query_selector('//*[@id="js_cover_area"]/div[1]')
+            pic = await new_page.wait_for_selector('//*[@id="js_cover_area"]/div[1]')
             await pic.hover()
-            new_page.wait_for_timeout(500)  
-            pick_from_article = await new_page.query_selector('//*[@id="js_cover_null"]/ul/li[1]/a')
+            time.sleep(1)
+            pick_from_article = await new_page.wait_for_selector('//*[@id="js_cover_null"]/ul/li[1]/a')
             await pick_from_article.click()
-            new_page.wait_for_timeout(500)  
-            first_pic = await new_page.query_selector('//*[@id="vue_app"]/div[2]/div[1]/div/div[2]/div[1]/div/ul')
+            time.sleep(1) 
+            first_pic = await new_page.wait_for_selector('//*[@id="vue_app"]/div[2]/div[1]/div/div[2]/div[1]/div/ul/li/div')
             await first_pic.click()
-            new_page.wait_for_timeout(500)  
-            next_btn = await new_page.query_selector('//*[@id="vue_app"]/div[2]/div[1]/div/div[3]/div[1]/button')
+            time.sleep(1)
+            next_btn = await new_page.wait_for_selector('//*[@id="vue_app"]/div[2]/div[1]/div/div[3]/div[1]/button')
             await next_btn.click()
-            new_page.wait_for_timeout(500)
-            finish_btn = await new_page.query_selector('//*[@id="vue_app"]/div[2]/div[1]/div/div[3]/div[2]/button')
+            time.sleep(1)
+            finish_btn = await new_page.wait_for_selector('//*[@id="vue_app"]/div[2]/div[1]/div/div[3]/div[2]/button')
             await finish_btn.click()
-            new_page.wait_for_timeout(500)
-            publish_btn = await new_page.query_selector('//*[@id="js_send"]/button')
+            time.sleep(5)
+            # 进入发布流程
+            publish_btn = await new_page.wait_for_selector('//*[@id="js_send"]/button')
             await publish_btn.click()
-            new_page.wait_for_timeout(500)
-            publish_again = await new_page.query_selector('//*[@id="vue_app"]/div[2]/div[1]/div[1]/div/div[3]/div/div/div[1]/button')
-            await publish_again.click()
-            new_page.wait_for_timeout(500)
-            publish_3 = await new_page.query_selector('//*[@id="vue_app"]/div[2]/div[2]/div[1]/div/div[3]/div/div[1]/button')
-            await publish_3.click()
-            new_page.wait_for_timeout(500)
+            time.sleep(1)
 
-            time.sleep(10)
+            publish_again = await new_page.wait_for_selector('//*[@id="vue_app"]/div[2]/div[1]/div[1]/div/div[3]/div/div/div[1]/button')
+            await publish_again.click()
+            time.sleep(1)
+            publish_3 = await new_page.wait_for_selector('//*[@id="vue_app"]/div[2]/div[2]/div[1]/div/div[3]/div/div[1]/button')
+            await publish_3.click()
+            time.sleep(1)
+            
+            # 此处需处理成扫码成功后关掉浏览器
+            time.sleep(100)
 
             
     async def main(self):
