@@ -22,7 +22,7 @@ def get_article_txt(url):
 def create_article(url): 
     txt = get_article_txt(url)
     if txt == "ERROR":
-        return
+        return ''
     content = f'请阅读这篇文字， ${txt}   这篇文字是从一个网页上摘录下来的，有一篇文章的主体内容，还有一些无关内容。请甄别并删除无关内容。明白文章表达的意思，抓住其主旨，将文章改写成200字左右短文，注意分段，语言风格生动活泼。'
 
     client = OpenAI(
@@ -40,8 +40,4 @@ def create_article(url):
     )
     
     # 通过 API 我们获得了 Kimi 大模型给予我们的回复消息（role=assistant）
-    print(completion.choices[0].message.content)
-
-if __name__ == '__main__':
-    url = 'https://mp.weixin.qq.com/s?__biz=MzI5ODI4NTA4Mg==&mid=2247487291&idx=1&sn=4961f5ef92d5cffc5c836c0618ee442f&chksm=ed0299797c506f0ab47c85dded619c8d221d71289ddf3eb87e562003ee2b6ad3dbcdb013d8b0#rd'
-    create_article(url)
+    return completion.choices[0].message.content

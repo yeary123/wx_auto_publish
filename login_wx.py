@@ -13,23 +13,13 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 # from ffmpy import FFmpeg
 from moviepy.editor import *
 from playwright.async_api import Playwright, async_playwright
-from config import conigs
-from logs import config_log
+from base.config import conigs
+from base.logs import config_log
 from tqdm import tqdm
 from datetime import datetime
 from PIL import Image  
-import pyperclip
 import io  
   
-def image_to_clipboard(image_path):  
-    img = open('/Users/liqian/Documents/wireshark.jpeg','rb')
-    image_data = img.read()
-    img.close()
-    pyperclip.copy(image_data)
-
-  
-# 使用函数  
-image_to_clipboard('/path/to/your/image.png')
 def delete_all_files(folder_path):
     # 获取文件夹中所有文件的列表
     try:
