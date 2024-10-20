@@ -1,6 +1,38 @@
 from openai import OpenAI
 import requests  
 from bs4 import BeautifulSoup  
+import time
+import json  
+import os 
+
+# 指定输出文件夹名称  
+output_folder = 'json'  
+input_folder = 'origin_data'
+
+def read_txt_to_dict(file_path):  
+    result = []  
+      
+    with open(file_path, 'r', encoding='utf-8') as file:  
+        for line in file:  
+            # 去除每行末尾的换行符  
+            line = line.strip()  
+              
+            # 分割标题和URL，假设它们之间由制表符（\t）分隔  
+            parts = line.split('\t')  
+              
+            if len(parts) == 2:  
+                title = parts[0]  
+                url = parts[1]  
+                result.append({  
+                    'title': title,  
+                    'url': url  
+                })  
+            else:  
+                # 如果格式不正确，可以选择跳过或记录日志  
+                print(f"格式不正确的行: {line}")  
+      
+    return result  
+
 
 def get_article_txt(url):
     # 发送HTTP GET请求获取网页内容  
@@ -13,31 +45,70 @@ def get_article_txt(url):
         
         # 获取网页中的所有文字内容  
         text = soup.get_text()  
-        
+        print("已获取原文")
         return text
     else:  
         print(f"ERROE: {response.status_code}")
         return "error"
     
-def create_article(url): 
+def create_article(title,url): 
     txt = get_article_txt(url)
     if txt == "ERROR":
         return ''
-    content = f'请阅读这篇文字， ${txt}   这篇文字是从一个网页上摘录下来的，有一篇文章的主体内容，还有一些无关内容。请甄别并删除无关内容。明白文章表达的意思，抓住其主旨，将文章改写成200字左右短文，注意分段，语言风格生动活泼。'
+    content = f'请阅读这篇文字， ${txt}   这篇文字是从一个网页上摘录下来的，有一篇文章的主体内容，还有一些无关内容。请甄别并删除无关内容。明白文章表达的意思，抓住其主旨，将文章改写成200字左右短文，注意分段，语言风格生动活泼。不要出现作者表达了、文章主旨是之类的表述。我们的读者是不知道有原文章的。'
 
     client = OpenAI(
         api_key="sk-61TKoPC9JDizDvfptKSNvvj5VerE8TX2WSL4EJMyYtPriAXV", # 在这里将 MOONSHOT_API_KEY 替换为你从 Kimi 开放平台申请的 API Key
         base_url="https://api.moonshot.cn/v1",
     )
+    try:
+        completion = client.chat.completions.create(
+            model = "moonshot-v1-8k",
+            messages = [
+                {"role": "system", "content": "你是资深文字编辑。擅长改写文章。"},
+                {"role": "user", "content": content}
+            ],
+            temperature = 0.3,
+        )
+        # 通过 API 我们获得了 Kimi 大模型给予我们的回复消息（role=assistant）
+        content = completion.choices[0].message.content
+        print("已获取改写文章")
+        # 创建字典来存储要写入 JSON 文件的数据  
+        data = {  
+            'title': title,  
+            'content': content  
+        }   
+        os.makedirs(output_folder, exist_ok=True)  
+        # 将字典写入 JSON 文件  
+        with open(f'{output_folder}/{title}.json', 'w', encoding='utf-8') as json_file:  
+            json.dump(data, json_file, ensure_ascii=False, indent=4)  
+        print("已写入json")
+    except:
+        print('调用大模型 or 写入json 出问题')
+
+    # 大模型限制，不能过于频繁调用
+    time.sleep(31)
+
+def deal_urls(dir_path):
+    # 获取当前文件夹下的所有文件  
+    files = os.listdir(dir_path)  
     
-    completion = client.chat.completions.create(
-        model = "moonshot-v1-8k",
-        messages = [
-            {"role": "system", "content": "你是资深文字编辑。"},
-            {"role": "user", "content": content}
-        ],
-        temperature = 0.3,
-    )
+    # 筛选以 .txt 结尾的文件  
+    txt_files = [f for f in files if f.endswith('.txt')]  
     
-    # 通过 API 我们获得了 Kimi 大模型给予我们的回复消息（role=assistant）
-    return completion.choices[0].message.content
+    result = []
+    # 遍历并读取每个 .txt 文件  
+    for txt_file in txt_files:  
+        # 构建文件的完整路径  
+        file_path = os.path.join(dir_path, txt_file)  
+        # 读取文件内容（这里以打印为例）  
+        with open(file_path, 'r', encoding='utf-8') as txt_file:  
+            result = read_txt_to_dict(file_path)
+    # 遍历结果        
+    for item in result:
+        title = item['title']  
+        url = item['url']  
+        print(f'开始处理文章：{title}')
+        create_article(title,url)
+
+deal_urls(input_folder)

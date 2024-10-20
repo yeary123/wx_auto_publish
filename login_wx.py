@@ -92,7 +92,7 @@ class login_wx(wx):
                 logging.info("账号未登录")
                 return
             print("账号已登录")
-            # 使用text()选择器查找包含"图文消息"文字的div元素  
+            # --------------------------------开始发布流程-------------------------------------------
             element = await page.wait_for_selector('//*[@id="app"]/div[2]/div[3]/div[2]/div/div[2]')  
             await element.click()
 
@@ -156,7 +156,7 @@ class login_wx(wx):
             publish_3 = await new_page.wait_for_selector('//*[@id="vue_app"]/div[2]/div[2]/div[1]/div/div[3]/div/div[1]/button')
             await publish_3.click()
             time.sleep(1)
-            
+            # ------------------------------------发布流程结束-------------------------------------------------------
             # 此处需处理成扫码成功后关掉浏览器
             time.sleep(100)
 

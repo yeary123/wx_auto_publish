@@ -11,7 +11,7 @@ from base.logs import config_log
 # 获取当前文件的完整路径  
 current_file_path = __file__  
 from playwright.sync_api import sync_playwright  
-  
+
 async def get_all_a_tags(page):  
     # 使用 evaluate 函数在浏览器上下文中执行 JavaScript  
     result = await page.evaluate("""() => {  
@@ -27,11 +27,16 @@ async def get_all_a_tags(page):
     }""")  
     return result  
   
-def write_to_txt(data, filename,url_filter):  
-    with open(filename, 'w', encoding='utf-8') as file:  
+def write_to_txt(data, filename, url_filter):  
+    path = os.path.join(os.path.abspath("") , 'origin_data')
+    delete_all_files(path)
+    print(f'删掉老数据:{path}')
+    os.makedirs(path)
+    with open(f'{path}/{filename}', 'w', encoding='utf-8') as file:  
         for item in data:  
             if url_filter in item['href'] :
                 file.write(f"{item['title']}\t{item['href']}\n")  
+    print(f'抓取数据已写入:{filename}')
   
 
 def delete_all_files(folder_path):
@@ -95,14 +100,25 @@ class login_xb(xb):
             await page.add_init_script(path="stealth.min.js")
             await page.goto("https://a.newrank.cn/trade/media/hotList")
             print("正在判断账号是否登录")
-            avatar = await page.wait_for_selector('#__layout > div > header > div.nr-content.inner > div.right > div > div > span')
-            print("账号已登陆")
-            # export = await page.wait_for_selector('#__layout > div > div.container > div > div.list-content > div.filter-box > div.flex-right > div > span > span > button > span > img')
-            # await export.click()
+            try:
+                avatar = await page.wait_for_selector('#__layout > div > header > div.nr-content.inner > div.right > div > div > span')
+            except:
+                delete_all_files('cookie')
+                print("账号未登陆")
+                return
 
+
+            print("账号已登陆")
+
+            # 选择阅读数前50
+            selector = await page.wait_for_selector('#__layout > div > div.container > div > div.list-content > div.filter-box > div:nth-child(2) > div:nth-child(2)')
+            await selector.click()
+            read50 = await page.wait_for_selector('body > div.el-select-dropdown.el-popper > div.el-scrollbar > div.el-select-dropdown__wrap.el-scrollbar__wrap > ul > li:nth-child(2)')
+            await read50.click()
+            print('选择阅读数50标签')
             # 获取所有的 a 标签文字和链接  
             a_tags_data = await get_all_a_tags(page)  
-    
+            print('抓取其中的文章名和链接')
             # 将结果写入 txt 文件  
             write_to_txt(a_tags_data, 'xb_output.txt','weixin')  
 

@@ -1,2 +1,4 @@
 cookie/
 *.log
+origin_data/
+json/
