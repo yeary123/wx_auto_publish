@@ -7,7 +7,24 @@ import os
 
 # 指定输出文件夹名称  
 output_folder = 'json'  
+img_folder = 'img'
 input_folder = 'origin_data'
+
+def download_image(url, save_path):
+    try:
+        # 发送GET请求获取图片内容
+        response = requests.get(url)
+        response.raise_for_status()  # 检查请求是否成功
+        os.makedirs(img_folder,exist_ok=True)
+        # 将图片内容写入文件
+        with open(save_path, 'wb') as file:
+            file.write(response.content)
+
+        print(f"图片已成功下载并保存到 {save_path}")
+    except requests.exceptions.RequestException as e:
+        print(f"请求失败: {e}")
+    except IOError as e:
+        print(f"文件操作失败: {e}")
 
 def read_txt_to_dict(file_path):  
     result = []  
@@ -34,7 +51,7 @@ def read_txt_to_dict(file_path):
     return result  
 
 
-def get_article_txt(url):
+def get_article_txt_img(url):
     # 发送HTTP GET请求获取网页内容  
     response = requests.get(url)  
     
@@ -45,16 +62,26 @@ def get_article_txt(url):
         
         # 获取网页中的所有文字内容  
         text = soup.get_text()  
+        # 查找所有 img 标签
+        img_tags = soup.find_all('img')
+        # 提取所有 img 标签的 data-src 或 src 属性值，如果都为空则不添加到列表中
+        img_srcs = [
+            img.get('data-src') or img.get('src')
+            for img in img_tags
+            if img.get('data-src') or img.get('src')
+        ]
         print("已获取原文")
-        return text
+        return (text,img_srcs)
     else:  
         print(f"ERROE: {response.status_code}")
-        return "error"
+        return ("error",[])
     
 def create_article(title,url): 
-    txt = get_article_txt(url)
+    # 获取文章内容和图片
+    (txt,imgs) = get_article_txt_img(url)
     if txt == "ERROR":
         return ''
+    
     content = f'请阅读这篇文字， ${txt}   这篇文字是从一个网页上摘录下来的，有一篇文章的主体内容，还有一些无关内容。请甄别并删除无关内容。明白文章表达的意思，抓住其主旨，将文章改写成200字左右短文，注意分段，语言风格生动活泼。不要出现作者表达了、文章主旨是之类的表述。我们的读者是不知道有原文章的。'
 
     client = OpenAI(
@@ -73,18 +100,24 @@ def create_article(title,url):
         # 通过 API 我们获得了 Kimi 大模型给予我们的回复消息（role=assistant）
         content = completion.choices[0].message.content
         print("已获取改写文章")
+        # 下载文章图片
+        index = int(len(imgs)/2)
+        img = imgs[index]
+        download_image(img, f'{img_folder}/{title}.jpg')
+        
         # 创建字典来存储要写入 JSON 文件的数据  
         data = {  
             'title': title,  
-            'content': content  
+            'content': content,
+            'img': f'{img_folder}/{title}.jpg'  
         }   
         os.makedirs(output_folder, exist_ok=True)  
         # 将字典写入 JSON 文件  
         with open(f'{output_folder}/{title}.json', 'w', encoding='utf-8') as json_file:  
             json.dump(data, json_file, ensure_ascii=False, indent=4)  
         print("已写入json")
-    except:
-        print('调用大模型 or 写入json 出问题')
+    except Exception as e:
+        print(f'调用大模型 or 写入json 出问题:{e}')
 
     # 大模型限制，不能过于频繁调用
     time.sleep(31)
