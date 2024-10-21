@@ -77,6 +77,7 @@ class login_wx(wx):
             'title':'1211212',
             'author':'222',
             'content':'fffegewqgeq',
+            'img':''
         }
         
     async def login(self) -> None:
@@ -110,24 +111,33 @@ class login_wx(wx):
             time.sleep(1)
             # 填写正文
             await new_page.keyboard.press('Tab') 
-            #   在开头插入图片 
-            pick_pic = await new_page.wait_for_selector('//*[@id="js_editor_insertimage"]')
-            await pick_pic.click()
+            #   在开头插入图片 上传
+            upload_pic = await new_page.wait_for_selector('#js_editor_insertimage')
+            await upload_pic.click()
             time.sleep(1)
-            pick_from_library = await new_page.wait_for_selector('//*[@id="js_editor_insertimage"]/ul/li[2]')
-            await pick_from_library.click()
+            # 等待并点击触发文件选择器的按钮  
+            new_page.on("filechooser", lambda file_chooser: file_chooser.set_files(self.dialog['img']))
+            # 点击触发文件选择器的按钮  
+            await new_page.click('#js_editor_insertimage > ul > li:nth-child(1)')             
             time.sleep(1)
-            selected_pic = await new_page.wait_for_selector('//*[@id="js_image_dialog_list_wrp"]/div/div[1]')#此处随机生成一个数字
-            await selected_pic.click()
-            time.sleep(1)
-            sure = await new_page.wait_for_selector('//*[@id="vue_app"]/div[2]/div[1]/div/div[3]/div[2]/button')
-            await sure.click()
-            time.sleep(1)
+            #   在开头插入图片 不上传
+            # pick_pic = await new_page.wait_for_selector('//*[@id="js_editor_insertimage"]')
+            # await pick_pic.click()
+            # time.sleep(1)
+            # pick_from_library = await new_page.wait_for_selector('//*[@id="js_editor_insertimage"]/ul/li[2]')
+            # await pick_from_library.click()
+            # time.sleep(1)
+            # selected_pic = await new_page.wait_for_selector('//*[@id="js_image_dialog_list_wrp"]/div/div[1]')#此处随机生成一个数字
+            # await selected_pic.click()
+            # time.sleep(1)
+            # sure = await new_page.wait_for_selector('//*[@id="vue_app"]/div[2]/div[1]/div/div[3]/div[2]/button')
+            # await sure.click()
+            # time.sleep(1)
             #    写入正文  
             await new_page.keyboard.type(self.dialog['content'])
             time.sleep(1)
             # 滚动到页面底部  
-            page.evaluate('window.scrollTo(0, document.body.scrollHeight);')  
+            new_page.evaluate('window.scrollTo(0, document.body.scrollHeight);')  
   
             # 选择第一张图片做封面
             pic = await new_page.wait_for_selector('//*[@id="js_cover_area"]/div[1]')

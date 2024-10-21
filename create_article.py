@@ -4,22 +4,37 @@ from bs4 import BeautifulSoup
 import time
 import json  
 import os 
+from PIL import Image
 
 # 指定输出文件夹名称  
 output_folder = 'json'  
 img_folder = 'img'
 input_folder = 'origin_data'
 
-def download_image(url, save_path):
+def deal_img(img_folder,img_name):
+    img_path = os.path.join(img_folder, f'{img_name}.jpg')
+    over_img_path = os.path.join(img_folder, f"over_{img_name}.jpg")
+    # 打开图像文件
+    img = Image.open(img_path)
+    # 获取图像的宽度和高度
+    width, height = img.size
+    img.close()
+    x = width - 250
+    y = height - 45
+    print(f"Width: {width}, Height: {height}")
+    os.system(f"ffmpeg -i {img_path} -vf \"drawbox=x={x}:y={y}:w=250:h=45:color=white@0.5:t=fill\" -c:a copy {over_img_path}")
+    return over_img_path
+
+def download_image(url, img_folder ,img_name):
     try:
         # 发送GET请求获取图片内容
         response = requests.get(url)
         response.raise_for_status()  # 检查请求是否成功
         os.makedirs(img_folder,exist_ok=True)
         # 将图片内容写入文件
+        save_path = os.path.join(img_folder, f"{img_name}.jpg")
         with open(save_path, 'wb') as file:
             file.write(response.content)
-
         print(f"图片已成功下载并保存到 {save_path}")
     except requests.exceptions.RequestException as e:
         print(f"请求失败: {e}")
@@ -103,13 +118,13 @@ def create_article(title,url):
         # 下载文章图片
         index = int(len(imgs)/2)
         img = imgs[index]
-        download_image(img, f'{img_folder}/{title}.jpg')
-        
+        download_image(img, img_folder,title)
+        dealt_img_path = deal_img(img_folder,title)
         # 创建字典来存储要写入 JSON 文件的数据  
         data = {  
             'title': title,  
             'content': content,
-            'img': f'{img_folder}/{title}.jpg'  
+            'img': dealt_img_path  
         }   
         os.makedirs(output_folder, exist_ok=True)  
         # 将字典写入 JSON 文件  
