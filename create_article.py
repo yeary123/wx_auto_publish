@@ -10,10 +10,13 @@ from PIL import Image
 output_folder = 'json'  
 img_folder = 'img'
 input_folder = 'origin_data'
+# 获取当前文件的完整路径  
+current_file_path = __file__ 
 
 def deal_img(img_folder,img_name):
     img_path = os.path.join(img_folder, f'{img_name}.jpg')
-    over_img_path = os.path.join(img_folder, f"over_{img_name}.jpg")
+    over_img_name = f"over_{img_name}.jpg"
+    over_img_path = os.path.join(img_folder, over_img_name)
     # 打开图像文件
     img = Image.open(img_path)
     # 获取图像的宽度和高度
@@ -23,7 +26,8 @@ def deal_img(img_folder,img_name):
     y = height - 45
     print(f"Width: {width}, Height: {height}")
     os.system(f"ffmpeg -i {img_path} -vf \"drawbox=x={x}:y={y}:w=250:h=45:color=white@0.5:t=fill\" -c:a copy {over_img_path}")
-    return over_img_path
+    path = os.path.join(os.path.dirname(current_file_path) , f'{img_folder}/{over_img_name}')
+    return path
 
 def download_image(url, img_folder ,img_name):
     try:
