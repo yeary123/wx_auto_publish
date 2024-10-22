@@ -7,3 +7,48 @@ playwright._impl._errors.TargetClosedError: Target page, context or browser has 
 [2024-10-21 17:21:01,269]-warnings.py-109-MainThread-/Users/liqian/wx_login/login_wx.py:147: RuntimeWarning: coroutine 'Page.evaluate' was never awaited
   new_page.evaluate('window.scrollTo(0, document.body.scrollHeight);')
 
+[2024-10-22 14:19:20,455]-warnings.py-109-MainThread-/Users/liqian/wx_login/login_wx.py:140: RuntimeWarning: coroutine 'Page.evaluate' was never awaited
+  new_page.evaluate('window.scrollTo(0, document.body.scrollHeight);')
+
+[2024-10-22 14:21:23,232]-warnings.py-109-MainThread-/Users/liqian/wx_login/login_wx.py:140: RuntimeWarning: coroutine 'Page.evaluate' was never awaited
+  new_page.evaluate('window.scrollTo(0, document.body.scrollHeight);')
+
+[2024-10-22 14:23:48,548]-warnings.py-109-MainThread-/Users/liqian/wx_login/login_wx.py:140: RuntimeWarning: coroutine 'Page.evaluate' was never awaited
+  new_page.evaluate('window.scrollTo(0, document.body.scrollHeight);')
+
+[2024-10-22 14:24:00,648]-warnings.py-109-MainThread-/Users/liqian/wx_login/login_wx.py:165: RuntimeWarning: coroutine 'Page.fill' was never awaited
+  new_page.fill('#vue_app > div:nth-child(5) > div.new_mass_send_dialog > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__bd > div > div > form > div.mass-send__td-setting.timer_setting > div.mass-send__timer-container > div > dl.weui-desktop-picker__time.weui-desktop-picker__focus > dt > span > div > span > input', '15:34')  # 替换为你想要输入的时间
+
+[2024-10-22 14:34:26,470]-warnings.py-109-MainThread-/Users/liqian/wx_login/login_wx.py:140: RuntimeWarning: coroutine 'Page.evaluate' was never awaited
+  new_page.evaluate('window.scrollTo(0, document.body.scrollHeight);')
+
+[2024-10-22 14:34:38,602]-warnings.py-109-MainThread-/Users/liqian/wx_login/login_wx.py:165: RuntimeWarning: coroutine 'Page.click' was never awaited
+  new_page.click('#vue_app > div:nth-child(5) > div.new_mass_send_dialog > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__bd > div > div > form > div.mass-send__td-setting.timer_setting > div.mass-send__timer-container > div > dl.weui-desktop-picker__time.weui-desktop-picker__focus > dt > span > div > span > input')
+
+[2024-10-22 14:34:38,603]-warnings.py-109-MainThread-/Users/liqian/wx_login/login_wx.py:166: RuntimeWarning: coroutine 'Keyboard.type' was never awaited
+  new_page.keyboard.type('15:30')
+
+[2024-10-22 14:36:29,530]-warnings.py-109-MainThread-/Users/liqian/wx_login/login_wx.py:140: RuntimeWarning: coroutine 'Page.evaluate' was never awaited
+  new_page.evaluate('window.scrollTo(0, document.body.scrollHeight);')
+
+[2024-10-22 14:37:57,821]-warnings.py-109-MainThread-/Users/liqian/wx_login/login_wx.py:140: RuntimeWarning: coroutine 'Page.evaluate' was never awaited
+  new_page.evaluate('window.scrollTo(0, document.body.scrollHeight);')
+
+[2024-10-22 14:46:44,279]-warnings.py-109-MainThread-/Users/liqian/wx_login/login_wx.py:167: RuntimeWarning: coroutine 'Keyboard.type' was never awaited
+  new_page.keyboard.type('15:30')
+
+[2024-10-22 14:49:35,543]-warnings.py-109-MainThread-/Users/liqian/wx_login/login_wx.py:167: RuntimeWarning: coroutine 'Page.fill' was never awaited
+  new_page.fill('input[placeholder="请选择时间"]', '')
+
+[2024-10-22 14:49:35,545]-warnings.py-109-MainThread-/Users/liqian/wx_login/login_wx.py:168: RuntimeWarning: coroutine 'Keyboard.type' was never awaited
+  new_page.keyboard.type('15:30')
+
+[2024-10-22 15:32:42,584]-warnings.py-109-MainThread-/Users/liqian/wx_login/login_wx.py:123: RuntimeWarning: coroutine 'sleep' was never awaited
+  asyncio.sleep(10)
+
+[2024-10-22 15:47:50,174]-warnings.py-109-MainThread-/Users/liqian/wx_login/login_wx.py:123: RuntimeWarning: coroutine 'sleep' was never awaited
+  asyncio.sleep(1)
+
+[2024-10-22 15:52:58,862]-warnings.py-109-MainThread-/Users/liqian/wx_login/login_wx.py:123: RuntimeWarning: coroutine 'sleep' was never awaited
+  asyncio.sleep(1)
+
