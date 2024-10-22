@@ -187,10 +187,10 @@ class login_wx(wx):
             time.sleep(1)
             publish_3 = await new_page.wait_for_selector('//*[@id="vue_app"]/div[2]/div[2]/div[1]/div/div[3]/div/div[1]/button')
             await publish_3.click()
-            time.sleep(1)
+            time.sleep(10)#等待返回发表状态
             # ------------------------------------发布流程结束-------------------------------------------------------
-            # 此处需处理成扫码成功后关掉浏览器
-            # time.sleep(100)
+            # 关掉浏览器
+            await browser.close()
 
             
     async def main(self):
