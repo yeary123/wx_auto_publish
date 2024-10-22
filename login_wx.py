@@ -16,9 +16,11 @@ from playwright.async_api import Playwright, async_playwright
 from base.config import conigs
 from base.logs import config_log
 from tqdm import tqdm
-from datetime import datetime
+from datetime import datetime, timedelta
 from PIL import Image  
 import io  
+import json
+
   
 def delete_all_files(folder_path):
     # 获取文件夹中所有文件的列表
@@ -63,7 +65,7 @@ class wx():
 
 
 class login_wx(wx):
-    def __init__(self, timeout: int, cookie_file: str, dialog_file: str = None):
+    def __init__(self, timeout: int, cookie_file: str, dialog: str = None):
         super(login_wx, self).__init__()
         """
         初始化
@@ -72,14 +74,14 @@ class login_wx(wx):
         """
         self.timeout = timeout * 1000
         self.cookie_file = cookie_file
-        self.dialog_file = dialog_file
-        self.dialog = {
-            'title':'1211212',
-            'author':'222',
-            'content':'fffegewqgeq',
-            'img':'/Users/liqian/Documents/wireshark.jpeg',
-            'time':'',
-        }
+        self.dialog = dialog
+        # self.dialog = {
+        #     'title':'1211212',
+        #     'author':'222',
+        #     'content':'fffegewqgeq',
+        #     'img':'/Users/liqian/Documents/wireshark.jpeg',
+        #     'time':'',
+        # }
         
     async def login(self) -> None:
         async with async_playwright() as playwright:
@@ -172,7 +174,7 @@ class login_wx(wx):
             await input_time_icon.click()
             time.sleep(1)
             await new_page.fill('#vue_app > div:nth-child(5) > div.new_mass_send_dialog > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__bd > div > div > form > div.mass-send__td-setting.timer_setting > div.mass-send__timer-container > div > dl.weui-desktop-picker__time.weui-desktop-picker__focus > dt > span > div > span > input', '') 
-            await new_page.keyboard.type('15:30')
+            await new_page.keyboard.type(self.dialog['time'])
             time.sleep(1)
             # await new_page.click('body:not(:has(select#mySelect.open))')  # 这是一个伪代码示例，实际选择器可能需要根据页面结构进行调整
             input_time_icon1 = await new_page.wait_for_selector('#vue_app > div:nth-child(5) > div.new_mass_send_dialog > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__bd > div > div > form > div.mass-send__td-setting.timer_setting > div.mass-send__timer-container > div > dl.weui-desktop-picker__time.weui-desktop-picker__focus > dt > i')
@@ -186,7 +188,7 @@ class login_wx(wx):
             time.sleep(1)
             # ------------------------------------发布流程结束-------------------------------------------------------
             # 此处需处理成扫码成功后关掉浏览器
-            time.sleep(100)
+            # time.sleep(100)
 
             
     async def main(self):
@@ -213,16 +215,53 @@ def find_file(find_path, file_type) -> list:
                 data_list.append(file_path)
     return data_list
 
+def get_target_time(n):
+    # 获取当前时间
+    current_time = datetime.now()
+    # 计算时间增量，n个30分钟
+    time_delta = timedelta(minutes=30 * n)
+    # 计算目标时间
+    target_time = current_time + time_delta
+    # 格式化目标时间为 HH:MM
+    formatted_target_time = target_time.strftime("%H:%M")
+    return formatted_target_time
 
 def run():
     cookie_list = find_file("cookie", "json")
+    article_list = find_file("json", "json")
     x = 0
     for cookie_path in cookie_list:
         x += 1
         cookie_name: str = os.path.basename(cookie_path)
-        print("正在使用[%s]发布作品，当前账号排序[%s]" % (cookie_name.split("_")[1][:-5], str(x)))
-        app = login_wx(60, cookie_path)
-        asyncio.run(app.main())
+        author = cookie_name.split("_")[1][:-5]
+        print("正在使用[%s]发布作品，当前账号排序[%s]" % (author, str(x)))
+        for index, article_path in enumerate(article_list):
+            n = index + 1
+            target_time = get_target_time(n)
+            article = json.load(open(article_path, encoding='utf8'))
+            dialog = {
+                "title": article["title"],
+                "author": author,
+                "content": article["content"],
+                "img": article["img"],
+                "time": target_time
+            }
+            try:
+                app = login_wx(60, cookie_path,dialog)
+                asyncio.run(app.main())
+            except Exception as e:
+                print(f'上传报错：{e}')
+                
+            print("第%s个作品已完成" % str(index + 1))
+            # 删除article里的图片和article_path文件
+            try:
+                for img in article["img"]:
+                    os.remove(img)
+                os.remove(article_path)
+            except FileNotFoundError:
+                pass
+            if index > 10:
+                break
 
 
 if __name__ == '__main__':

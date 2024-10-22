@@ -31,7 +31,8 @@ def write_to_txt(data, filename, url_filter):
     path = os.path.join(os.path.abspath("") , 'origin_data')
     delete_all_files(path)
     print(f'删掉老数据:{path}')
-    os.makedirs(path)
+    if not os.path.exists(path):
+        os.makedirs(path)
     with open(f'{path}/{filename}', 'w', encoding='utf-8') as file:  
         for item in data:  
             if url_filter in item['href'] :
