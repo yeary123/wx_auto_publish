@@ -235,8 +235,8 @@ def run():
         cookie_name: str = os.path.basename(cookie_path)
         author = cookie_name.split("_")[1][:-5]
         print("正在使用[%s]发布作品，当前账号排序[%s]" % (author, str(x)))
+        n = 1
         for index, article_path in enumerate(article_list):
-            n = index + 1
             target_time = get_target_time(n)
             article = json.load(open(article_path, encoding='utf8'))
             dialog = {
@@ -251,7 +251,7 @@ def run():
                 asyncio.run(app.main())
             except Exception as e:
                 print(f'上传报错：{e}')
-                
+
             print("第%s个作品已完成" % str(index + 1))
             # 删除article里的图片和article_path文件
             try:
@@ -259,8 +259,11 @@ def run():
                     os.remove(img)
                 os.remove(article_path)
             except FileNotFoundError:
+                n-=1
                 pass
-            if index > 10:
+            
+            n += 1
+            if n > 10:
                 break
 
 
