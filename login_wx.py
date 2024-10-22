@@ -20,6 +20,8 @@ from datetime import datetime, timedelta
 from PIL import Image  
 import io  
 import json
+import get_wx_cookie
+import create_article
 
   
 def delete_all_files(folder_path):
@@ -229,6 +231,15 @@ def get_target_time(n):
 def run():
     cookie_list = find_file("cookie", "json")
     article_list = find_file("json", "json")
+    if len(cookie_list) == 0:
+        print("未找到cookie文件，请先运行get_wx_cookie.py")
+        get_wx_cookie.main()
+        cookie_list = find_file("cookie", "json")
+    if len(article_list) == 0:
+        print("未找到article文件，请先运行create_article.py")
+        create_article.main()
+        article_list = find_file("json", "json")
+    
     x = 0
     for cookie_path in cookie_list:
         x += 1

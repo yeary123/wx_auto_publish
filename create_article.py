@@ -148,6 +148,10 @@ def deal_urls(dir_path):
     # 筛选以 .txt 结尾的文件  
     txt_files = [f for f in files if f.endswith('.txt')]  
     
+    if len(txt_files) == 0:
+        print("没有txt文件数据，请先获取文章链接")
+        return
+    
     result = []
     # 遍历并读取每个 .txt 文件  
     for txt_file in txt_files:  
@@ -162,5 +166,8 @@ def deal_urls(dir_path):
         url = item['url']  
         print(f'开始处理文章：{title}')
         create_article(title,url)
+def main():
+    deal_urls(input_folder)
 
-deal_urls(input_folder)
+
+main()
