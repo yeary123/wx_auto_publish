@@ -24,9 +24,9 @@ def deal_img(img_folder,img_name):
     img.close()
     x = width - 250
     y = height - 45
-    print(f"Width: {width}, Height: {height}")
-    os.system(f"ffmpeg -i {img_path} -vf \"drawbox=x={x}:y={y}:w=250:h=45:color=white@1:t=fill\" -c:a copy {over_img_path}")
+    os.system(f"ffmpeg -i {img_path} -vf \"drawbox=x={x}:y={y}:w=350:h=60:color=white@0.8:t=fill\" -c:a copy {over_img_path}")
     path = os.path.join(os.path.dirname(current_file_path) , f'{img_folder}/{over_img_name}')
+    os.remove(img_path)
     return path
 
 def download_image(url, img_folder ,img_name):

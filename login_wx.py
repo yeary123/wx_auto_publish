@@ -252,15 +252,13 @@ def run():
             except Exception as e:
                 print(f'上传报错：{e}')
 
-            print("第%s个作品已完成" % str(index + 1))
+            print("第%s个作品已完成" % str(n))
             # 删除article里的图片和article_path文件
             try:
-                for img in article["img"]:
-                    os.remove(img)
+                os.remove(dialog["img"])
                 os.remove(article_path)
             except FileNotFoundError:
                 n-=1
-                pass
             
             n += 1
             if n > 10:
