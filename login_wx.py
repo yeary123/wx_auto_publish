@@ -226,6 +226,9 @@ def get_target_time(n):
     target_time = current_time + time_delta
     # 格式化目标时间为 HH:MM
     formatted_target_time = target_time.strftime("%H:%M")
+    # 如果目标时间到了次日，返回''
+    if target_time.date() > current_time.date():
+        return ''
     return formatted_target_time
 
 def run():
@@ -249,6 +252,9 @@ def run():
         n = 1
         for index, article_path in enumerate(article_list):
             target_time = get_target_time(n)
+            if target_time == '':
+                print("发布时间到了次日，结束执行")
+                break
             article = json.load(open(article_path, encoding='utf8'))
             dialog = {
                 "title": article["title"],
