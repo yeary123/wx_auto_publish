@@ -169,18 +169,20 @@ class login_wx(wx):
             publish_btn = await new_page.wait_for_selector('//*[@id="js_send"]/button')
             await publish_btn.click()
             time.sleep(1)
-            set_publish_time = await new_page.wait_for_selector('#vue_app > div:nth-child(5) > div.new_mass_send_dialog > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__bd > div > div > form > div.mass-send__td-setting.timer_setting > div > div > div.mass-send__timer-wrp')
+            # 打开定时发布开关
+            set_publish_time = await new_page.wait_for_selector('#vue_app > div:nth-child(5) > div.new_mass_send_dialog > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__bd > div > div > form > div.mass-send__td-setting > div > div > div.mass-send__timer-wrp > label > div')
+            # set_publish_time = await new_page.wait_for_selector('#vue_app > div:nth-child(5) > div.new_mass_send_dialog > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__bd > div > div > form > div.mass-send__td-setting.timer_setting > div > div > div.mass-send__timer-wrp > label')
             await set_publish_time.click()
             # 找到输入框并输入发布时间
-            input_time_icon = await new_page.wait_for_selector('#vue_app > div:nth-child(5) > div.new_mass_send_dialog > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__bd > div > div > form > div.mass-send__td-setting.timer_setting > div.mass-send__timer-container > div > dl:nth-child(2)')  
+            input_time_icon = await new_page.wait_for_selector('#vue_app > div:nth-child(5) > div.new_mass_send_dialog > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__bd > div > div > form > div.mass-send__td-setting > div.mass-send__timer-container > div > dl:nth-child(2) > dt > span')  
             await input_time_icon.click()
             time.sleep(1)
-            await new_page.fill('#vue_app > div:nth-child(5) > div.new_mass_send_dialog > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__bd > div > div > form > div.mass-send__td-setting.timer_setting > div.mass-send__timer-container > div > dl.weui-desktop-picker__time.weui-desktop-picker__focus > dt > span > div > span > input', '') 
+            await new_page.fill('#vue_app > div:nth-child(5) > div.new_mass_send_dialog > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__bd > div > div > form > div.mass-send__td-setting > div.mass-send__timer-container > div > dl.weui-desktop-picker__time.weui-desktop-picker__focus > dt > span > div > span > input', '') 
             await new_page.keyboard.type(self.dialog['time'])
             time.sleep(1)
-            # await new_page.click('body:not(:has(select#mySelect.open))')  # 这是一个伪代码示例，实际选择器可能需要根据页面结构进行调整
-            input_time_icon1 = await new_page.wait_for_selector('#vue_app > div:nth-child(5) > div.new_mass_send_dialog > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__bd > div > div > form > div.mass-send__td-setting.timer_setting > div.mass-send__timer-container > div > dl.weui-desktop-picker__time.weui-desktop-picker__focus > dt > i')
-            await input_time_icon1.click()
+            await new_page.click('#vue_app > div:nth-child(5) > div.new_mass_send_dialog > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__hd > h3')  # 这是一个伪代码示例，实际选择器可能需要根据页面结构进行调整
+            # input_time_icon1 = await new_page.wait_for_selector('#vue_app > div:nth-child(5) > div.new_mass_send_dialog > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__bd > div > div > form > div.mass-send__td-setting.timer_setting > div.mass-send__timer-container > div > dl.weui-desktop-picker__time.weui-desktop-picker__focus > dt > i')
+            # await input_time_icon1.click()
             time.sleep(1)
             publish_again = await new_page.wait_for_selector('//*[@id="vue_app"]/div[2]/div[1]/div[1]/div/div[3]/div/div/div[1]/button')
             await publish_again.click()
@@ -248,6 +250,7 @@ def run():
         x += 1
         cookie_name: str = os.path.basename(cookie_path)
         author = cookie_name.split("_")[1][:-5]
+        article_list = find_file("json", "json")
         print("正在使用[%s]发布作品，当前账号排序[%s]" % (author, str(x)))
         n = 1
         for index, article_path in enumerate(article_list):
@@ -267,6 +270,13 @@ def run():
                 "img": article["img"],
                 "time": target_time
             }
+            # 判断图片是否存在，不存在则跳过。顺便把json文件删掉
+            if not os.path.isfile(dialog["img"]):
+                try:
+                    os.remove(article_path)
+                except FileNotFoundError:
+                    continue
+                continue
             try:
                 app = login_wx(60, cookie_path,dialog)
                 asyncio.run(app.main())
