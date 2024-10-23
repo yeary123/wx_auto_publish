@@ -73,5 +73,5 @@ def main():
             app = creator_wx(email, 60)
             asyncio.run(app.main())
 
-
-main()
+if __name__ == '__main__':
+    main()

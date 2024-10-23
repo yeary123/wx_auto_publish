@@ -95,7 +95,7 @@ class login_xb(xb):
         
     async def login(self) -> None:
         async with async_playwright() as playwright:
-            browser = await self.playwright_init(playwright,False)
+            browser = await self.playwright_init(playwright,True)
             context = await browser.new_context(storage_state=self.cookie_file, user_agent=self.ua["web"])
             page = await context.new_page()
             await page.add_init_script(path="stealth.min.js")

@@ -255,7 +255,11 @@ def run():
             if target_time == '':
                 print("发布时间到了次日，结束执行")
                 break
-            article = json.load(open(article_path, encoding='utf8'))
+            try:
+                article = json.load(open(article_path, encoding='utf8'))
+            except UnicodeDecodeError:
+                continue
+            
             dialog = {
                 "title": article["title"],
                 "author": author,

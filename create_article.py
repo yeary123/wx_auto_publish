@@ -169,5 +169,5 @@ def deal_urls(dir_path):
 def main():
     deal_urls(input_folder)
 
-
-main()
+if __name__ == '__main__':
+    main()
