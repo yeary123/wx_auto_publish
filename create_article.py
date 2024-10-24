@@ -138,9 +138,6 @@ def create_article(title,url,api_key):
     except Exception as e:
         print(f'调用大模型 or 写入json 出问题:{e}')
 
-    # 大模型限制，不能过于频繁调用
-    time.sleep(31)
-
 def deal_urls(dir_path):
     # 获取当前文件夹下的所有文件  
     files = os.listdir(dir_path)  
@@ -170,6 +167,9 @@ def deal_urls(dir_path):
         count = len(API_KEY)
         api_key = API_KEY[index % count]
         create_article(title,url,api_key)
+        # 大模型限制，不能过于频繁调用
+        time.sleep(30/count)
+
 def main():
     deal_urls(input_folder)
 

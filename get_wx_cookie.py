@@ -66,7 +66,7 @@ class creator_wx():
 
 def main():
     while True:
-        email = input('请输入email\n输入"exit"将退出服务\n')
+        email = input('请输入账户名')
         if email == "exit":
             break
         else:

@@ -87,7 +87,7 @@ class login_wx(wx):
         
     async def login(self) -> None:
         async with async_playwright() as playwright:
-            browser = await self.playwright_init(playwright,False)
+            browser = await self.playwright_init(playwright,True)
             context = await browser.new_context(storage_state=self.cookie_file, user_agent=self.ua["web"])
             page = await context.new_page()
             await page.add_init_script(path="stealth.min.js")
@@ -170,9 +170,17 @@ class login_wx(wx):
             await publish_btn.click()
             time.sleep(1)
             # 打开定时发布开关
-            set_publish_time = await new_page.wait_for_selector('#vue_app > div:nth-child(5) > div.new_mass_send_dialog > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__bd > div > div > form > div.mass-send__td-setting > div > div > div.mass-send__timer-wrp > label > div')
-            # set_publish_time = await new_page.wait_for_selector('#vue_app > div:nth-child(5) > div.new_mass_send_dialog > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__bd > div > div > form > div.mass-send__td-setting.timer_setting > div > div > div.mass-send__timer-wrp > label')
-            await set_publish_time.click()
+            try:
+                set_publish_time = await new_page.wait_for_selector('#vue_app > div:nth-child(5) > div.new_mass_send_dialog > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__bd > div > div > form > div.mass-send__td-setting > div > div > div.mass-send__timer-wrp > label > div')
+                await set_publish_time.click()
+            except Exception as e:
+                print(f'点击定时异常：{e}')
+            try:    
+                set_publish_time1 = await new_page.wait_for_selector('#vue_app > div:nth-child(5) > div.new_mass_send_dialog > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__bd > div > div > form > div.mass-send__td-setting.timer_setting > div > div > div.mass-send__timer-wrp > label')
+                await set_publish_time1.click()
+            except Exception as e:
+                print(f'点击定时异常1：{e}')
+            time.sleep(1)
             # 找到输入框并输入发布时间
             input_time_icon = await new_page.wait_for_selector('#vue_app > div:nth-child(5) > div.new_mass_send_dialog > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__bd > div > div > form > div.mass-send__td-setting > div.mass-send__timer-container > div > dl:nth-child(2) > dt > span')  
             await input_time_icon.click()
