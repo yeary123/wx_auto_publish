@@ -95,7 +95,7 @@ def get_article_txt_img(url):
         print(f"ERROE: {response.status_code}")
         return ("error",[])
     
-def create_article(title,url): 
+def create_article(title,url,api_key): 
     # 获取文章内容和图片
     (txt,imgs) = get_article_txt_img(url)
     if txt == "ERROR":
@@ -104,7 +104,7 @@ def create_article(title,url):
     content = f'请阅读这篇文字， ${txt}   这篇文字是从一个网页上摘录下来的，有一篇文章的主体内容，还有一些无关内容。请甄别并删除无关内容。明白文章表达的意思，抓住其主旨，将文章改写成200字左右短文，注意分段，语言风格生动活泼。不要出现作者表达了、文章主旨是之类的表述。我们的读者是不知道有原文章的。'
 
     client = OpenAI(
-        api_key="sk-61TKoPC9JDizDvfptKSNvvj5VerE8TX2WSL4EJMyYtPriAXV", # 在这里将 MOONSHOT_API_KEY 替换为你从 Kimi 开放平台申请的 API Key
+        api_key=api_key, # 在这里将 MOONSHOT_API_KEY 替换为你从 Kimi 开放平台申请的 API Key
         base_url="https://api.moonshot.cn/v1",
     )
     try:
@@ -161,11 +161,15 @@ def deal_urls(dir_path):
         with open(file_path, 'r', encoding='utf-8') as txt_file:  
             result = read_txt_to_dict(file_path)
     # 遍历结果        
-    for item in result:
+    for index,item in enumerate(result):
         title = item['title']  
         url = item['url']  
         print(f'开始处理文章：{title}')
-        create_article(title,url)
+        # 从constants.py中获取API_KEY
+        from const import API_KEY
+        count = len(API_KEY)
+        api_key = API_KEY[index % count]
+        create_article(title,url,api_key)
 def main():
     deal_urls(input_folder)
 
