@@ -13,7 +13,7 @@ async def from_wy():
                    "Cronet/TTNetVersion:b4d74d15 2020-04-23 QuicVersion:0144d358 2020-03-24)"
         }
     async with async_playwright() as playwright:
-            browser = await playwright.chromium.launch(channel="chrome", headless=False)
+            browser = await playwright.chromium.launch(channel="chrome", headless=True)
             context = await browser.new_context(user_agent=ua["web"])
             page = await context.new_page()
             await page.add_init_script(path="stealth.min.js")

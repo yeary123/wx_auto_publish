@@ -5,6 +5,7 @@ import time
 import json  
 import os 
 from PIL import Image
+from playwright.sync_api import sync_playwright
 
 # 指定输出文件夹名称  
 output_folder = 'json'  
@@ -69,6 +70,30 @@ def read_txt_to_dict(file_path):
       
     return result  
 
+def find_element(url,selector):
+    ua = {
+            "web": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 "
+                   "Safari/537.36",
+            "app": "com.ss.android.ugc.aweme/110101 (Linux; U; Android 5.1.1; zh_CN; MI 9; Build/NMF26X; "
+                   "Cronet/TTNetVersion:b4d74d15 2020-04-23 QuicVersion:0144d358 2020-03-24)"
+        }
+    with sync_playwright() as p:  
+        browser = p.chromium.launch(headless=False,chromium_sandbox=False,
+                                          ignore_default_args=["--enable-automation"],
+                                          channel="chrome")  # 你可以设置为 headless=True 以在无头模式下运行  
+        context = browser.new_context(user_agent=ua["web"])
+        page = context.new_page() 
+        page.add_init_script(path="stealth.min.js")
+        page.goto(url)  # 替换为目标 URL  
+        parent_element_handle = page.query_selector(selector)  
+          
+        # 获取父元素的 HTML 内容  
+        parent_html = parent_element_handle.inner_html()  
+          
+        # 关闭浏览器  
+        browser.close()  
+        return parent_html
+        
 
 def get_article_txt_img(url):
     # 发送HTTP GET请求获取网页内容  
@@ -76,8 +101,15 @@ def get_article_txt_img(url):
     
     # 检查请求是否成功  
     if response.status_code == 200:  
+
+        html = response.text
+        
+        # 如果url包含 www.163.com，则需要playwright找到特定元素
+        if 'www.163.com' in url:
+            html = find_element(url,'#content > div.post_body')
+            
         # 使用BeautifulSoup解析网页内容  
-        soup = BeautifulSoup(response.text, 'html.parser')  
+        soup = BeautifulSoup(html, 'html.parser')  
         
         # 获取网页中的所有文字内容  
         text = soup.get_text()  
