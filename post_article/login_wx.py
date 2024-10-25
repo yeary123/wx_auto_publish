@@ -1,26 +1,14 @@
 import asyncio
-import hashlib
 import logging
-import random
-import re
 import time
-
-import cv2
-import pandas as pd
-import requests
-from PIL import Image
-from apscheduler.schedulers.blocking import BlockingScheduler
-# from ffmpy import FFmpeg
 from moviepy.editor import *
 from playwright.async_api import Playwright, async_playwright
+sys.path.append(os.getcwd())
 from base.config import conigs
 from base.logs import config_log
-from tqdm import tqdm
 from datetime import datetime, timedelta
-from PIL import Image  
-import io  
 import json
-import get_wx_cookie
+import post_article.get_wx_cookie as get_wx_cookie
 import create_article
 
   
@@ -242,12 +230,12 @@ def get_target_time(n):
     return formatted_target_time
 
 def run():
-    cookie_list = find_file("cookie", "json")
+    cookie_list = find_file("wx_cookie", "json")
     article_list = find_file("json", "json")
     if len(cookie_list) == 0:
         print("未找到cookie文件，请先运行get_wx_cookie.py")
         get_wx_cookie.main()
-        cookie_list = find_file("cookie", "json")
+        cookie_list = find_file("wx_cookie", "json")
     if len(article_list) == 0:
         print("未找到article文件，请先运行create_article.py")
         create_article.main()

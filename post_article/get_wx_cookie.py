@@ -1,11 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-@Time    : 2024/1/10 22:11
-@Author  : superhero
-@Email   : 838210720@qq.com
-@File    : get_cookie.py
-@IDE: PyCharm
-"""
 
 import asyncio
 import os
@@ -23,9 +16,8 @@ class creator_wx():
         self.email = email
         self.path = os.path.abspath('')
         self.desc = "cookie_%s.json" % email
-
-        if not os.path.exists(os.path.join(self.path, "cookie")):
-            os.makedirs(os.path.join(self.path, "cookie"))
+        if not os.path.exists(os.path.join(self.path, "wx_cookie")):
+            os.makedirs(os.path.join(self.path, "wx_cookie"))
 
     async def __cookie(self, playwright: Playwright) -> None:
         browser = await playwright.chromium.launch(channel="chrome", headless=False)
@@ -47,8 +39,6 @@ class creator_wx():
             try:
                 cookie_txt.index("ua_id")
                 print(self.email + " ——> 登录成功")
-                # with open(os.path.join(self.path, "cookie", self.phone + ".txt"), mode="w") as f:
-                #     f.write(cookie_txt)
                 await context.storage_state(path=os.path.join(self.path, "cookie", self.desc))
             except ValueError:
                 print(self.email + " ——> 登录失败，本次操作不保存cookie")
@@ -66,7 +56,7 @@ class creator_wx():
 
 def main():
     while True:
-        email = input('请输入账户名')
+        email = input('请输入账户名：')
         if email == "exit":
             break
         else:
@@ -75,3 +65,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+ 
