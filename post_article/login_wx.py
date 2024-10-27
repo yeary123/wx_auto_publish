@@ -236,6 +236,10 @@ def get_target_time(n):
 def run():
     cookie_list = find_cookie()
     article_list = find_article()
+    article_count = len(article_list)
+    cookie_count = len(cookie_list)
+    # 生成整数商
+    average = article_count // cookie_count
     if len(cookie_list) == 0:
         print("未找到cookie文件，请先运行get_wx_cookie.py")
         get_wx_cookie.main()
@@ -287,12 +291,21 @@ def run():
             # 删除article里的图片和article_path文件
             try:
                 os.remove(dialog["img"])
-                os.remove(article_path)
+                file_exists = True
             except FileNotFoundError:
-                n-=1
+                file_exists = False
+
+            try:
+                os.remove(article_path)
+                file_exists = file_exists and True
+            except FileNotFoundError:
+                file_exists = False
+
+            if not file_exists:
+                n -= 1
             
             n += 1
-            if n > 10:
+            if n > average:
                 break
 
 
