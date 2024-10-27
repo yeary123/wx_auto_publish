@@ -81,47 +81,51 @@ def read_txt_to_dict(file_path):
         
 
 def get_article_txt_img(url):
-    with sync_playwright() as p:  
-        browser = p.chromium.launch(headless=True,
-                                    chromium_sandbox=False,
-                                          ignore_default_args=["--enable-automation"],
-                                          channel="chrome")  # 你可以设置为 headless=True 以在无头模式下运行  
-        context = browser.new_context(user_agent=ua["web"])
-        page = context.new_page() 
-        page.add_init_script(path="stealth.min.js")
-        page.goto(url)  # 替换为目标 URL  
-        # 获取网页的html文本
-        try:
-            html = page.content()
-        except Exception as e:
-            print(e)
-        
-        # 如果url包含 www.163.com，则需要playwright找到特定元素
-        if 'www.163.com' in url:
-            parent_element_handle = page.query_selector('#content > div.post_body')  
-            # 获取父元素的 HTML 内容  
-            parent_html = parent_element_handle.inner_html()
-            html = parent_html
-        
-          
-        # 关闭浏览器  
-        browser.close()  
+    try:
+        with sync_playwright() as p:  
+            browser = p.chromium.launch(headless=True,
+                                        chromium_sandbox=False,
+                                            ignore_default_args=["--enable-automation"],
+                                            channel="chrome")  # 你可以设置为 headless=True 以在无头模式下运行  
+            context = browser.new_context(user_agent=ua["web"])
+            page = context.new_page() 
+            page.add_init_script(path="stealth.min.js")
+            page.goto(url)  # 替换为目标 URL  
+            # 获取网页的html文本
+            try:
+                html = page.content()
+            except Exception as e:
+                print(e)
             
-        # 使用BeautifulSoup解析网页内容  
-        soup = BeautifulSoup(html, 'html.parser')  
-        
-        # 获取网页中的所有文字内容  
-        text = soup.get_text()  
-        # 查找所有 img 标签
-        img_tags = soup.find_all('img')
-        # 提取所有 img 标签的 data-src 或 src 属性值，如果都为空则不添加到列表中
-        img_srcs = [
-            img.get('data-src') or img.get('src')
-            for img in img_tags
-            if img.get('data-src') or img.get('src')
-        ]
-        print("已获取原文")
-        return (text,img_srcs)
+            # 如果url包含 www.163.com，则需要playwright找到特定元素
+            if 'www.163.com' in url:
+                parent_element_handle = page.query_selector('#content > div.post_body')  
+                # 获取父元素的 HTML 内容  
+                parent_html = parent_element_handle.inner_html()
+                html = parent_html
+            
+            
+            # 关闭浏览器  
+            browser.close()  
+                
+            # 使用BeautifulSoup解析网页内容  
+            soup = BeautifulSoup(html, 'html.parser')  
+            
+            # 获取网页中的所有文字内容  
+            text = soup.get_text()  
+            # 查找所有 img 标签
+            img_tags = soup.find_all('img')
+            # 提取所有 img 标签的 data-src 或 src 属性值，如果都为空则不添加到列表中
+            img_srcs = [
+                img.get('data-src') or img.get('src')
+                for img in img_tags
+                if img.get('data-src') or img.get('src')
+            ]
+            print("已获取原文")
+            return (text,img_srcs)
+    except Exception as e:
+        print(f'获取原文失败：{e}')
+        return ("ERROR",[])
 
     
 def create_article(title,url,api_key): 

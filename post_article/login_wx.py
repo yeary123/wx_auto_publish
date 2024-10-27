@@ -195,14 +195,8 @@ class login_wx(wx):
         await self.login()
 
 
-def find_file(find_path, file_type) -> list:
-    """
-    寻找文件
-    :param find_path: 子路径
-    :param file_type: 文件类型
-    :return:
-    """
-    path = os.path.join(os.path.abspath(""), find_path)
+# 文件查找 path 绝对路径， file_type 文件类型
+def find_file(path, file_type) -> list:
     if not os.path.exists(path):
         os.makedirs(path)
     data_list = []
@@ -214,6 +208,16 @@ def find_file(find_path, file_type) -> list:
             if file_path.find(file_type) != -1:
                 data_list.append(file_path)
     return data_list
+
+def find_cookie():
+    current_directory = os.path.dirname(sys.argv[0])
+    path = os.path.join(current_directory, 'wx_cookie')
+    return find_file(path, "json")
+
+def find_article():
+    father_path = os.path.abspath("")
+    path = os.path.join(father_path, 'json')
+    return find_file(path, "json")
 
 def get_target_time(n):
     # 获取当前时间
@@ -230,8 +234,8 @@ def get_target_time(n):
     return formatted_target_time
 
 def run():
-    cookie_list = find_file("wx_cookie", "json")
-    article_list = find_file("json", "json")
+    cookie_list = find_cookie()
+    article_list = find_article()
     if len(cookie_list) == 0:
         print("未找到cookie文件，请先运行get_wx_cookie.py")
         get_wx_cookie.main()
