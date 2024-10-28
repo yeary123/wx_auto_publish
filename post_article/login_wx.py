@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 import json
 import post_article.get_wx_cookie as get_wx_cookie
 import create_article
+import random
 
   
 def delete_all_files(folder_path):
@@ -73,9 +74,9 @@ class login_wx(wx):
         #     'time':'',
         # }
         
-    async def login(self) -> None:
+    async def login(self) -> str:
         async with async_playwright() as playwright:
-            browser = await self.playwright_init(playwright,True)
+            browser = await self.playwright_init(playwright,False)
             context = await browser.new_context(storage_state=self.cookie_file, user_agent=self.ua["web"])
             page = await context.new_page()
             await page.add_init_script(path="stealth.min.js")
@@ -84,7 +85,7 @@ class login_wx(wx):
             if "token" not in page.url:
                 print("账号未登录")
                 logging.info("账号未登录")
-                return
+                return 'error'
             print("账号已登录")
             # --------------------------------开始发布流程-------------------------------------------
             element = await page.wait_for_selector('//*[@id="app"]/div[2]/div[3]/div[2]/div/div[2]')  
@@ -189,6 +190,7 @@ class login_wx(wx):
             # ------------------------------------发布流程结束-------------------------------------------------------
             # 关掉浏览器
             await browser.close()
+            return 'success'
 
             
     async def main(self):
@@ -236,25 +238,22 @@ def get_target_time(n):
 def run():
     cookie_list = find_cookie()
     article_list = find_article()
-    article_count = len(article_list)
-    cookie_count = len(cookie_list)
-    # 生成整数商
-    average = article_count // cookie_count
     if len(cookie_list) == 0:
         print("未找到cookie文件，请先运行get_wx_cookie.py")
         get_wx_cookie.main()
-        cookie_list = find_file("wx_cookie", "json")
+        cookie_list = find_cookie()
     if len(article_list) == 0:
         print("未找到article文件，请先运行create_article.py")
         create_article.main()
-        article_list = find_file("json", "json")
-    
+        article_list = find_article()
+    # 生成整数商
+    average = len(article_list) // len(cookie_list)
     x = 0
     for cookie_path in cookie_list:
         x += 1
         cookie_name: str = os.path.basename(cookie_path)
         author = cookie_name.split("_")[1][:-5]
-        article_list = find_file("json", "json")
+        article_list = find_article()
         print("正在使用[%s]发布作品，当前账号排序[%s]" % (author, str(x)))
         n = 1
         for index, article_path in enumerate(article_list):
@@ -266,31 +265,53 @@ def run():
                 article = json.load(open(article_path, encoding='utf8'))
             except UnicodeDecodeError:
                 continue
-            
+            img = article["img"]
+            # 判断图片是否存在，不存在则跳过。顺便把json文件删掉
+            if not os.path.isfile(img):
+                # 指定包含图片的文件夹路径
+                folder_path = os.path.join(os.path.abspath(""), 'default_img')
+                # 获取文件夹中所有文件的列表
+                files = os.listdir(folder_path)
+                # 过滤出图片文件，这里假设图片文件是以.jpg或.png结尾
+                image_files = [f for f in files if f.endswith('.jpg') or f.endswith('.png')]
+                # 确保至少有一张图片
+                if image_files:
+                    # 从图片列表中随机选择一张图片
+                    random_image = random.choice(image_files)
+                    # 构建完整的图片路径
+                    random_image_path = os.path.join(folder_path, random_image)
+                    img = random_image_path
+                    # 打印或处理随机选择的图片路径
+                    print("配图不存在，随机选择的图片是:", random_image_path)
+                else:
+                    print("配图不存在，文件夹中没有找到图片文件。")
+                    continue
             dialog = {
                 "title": article["title"],
                 "author": author,
                 "content": article["content"],
-                "img": article["img"],
+                "img": img,
                 "time": target_time
             }
-            # 判断图片是否存在，不存在则跳过。顺便把json文件删掉
-            if not os.path.isfile(dialog["img"]):
-                try:
-                    os.remove(article_path)
-                except FileNotFoundError:
-                    continue
-                continue
+            upload_result = ''
             try:
-                app = login_wx(60, cookie_path,dialog)
-                asyncio.run(app.main())
+                app = login_wx(60, cookie_path, dialog)
+                upload_result = asyncio.run(app.main())
             except Exception as e:
+                upload_result = 'error'
                 print(f'上传报错：{e}')
 
-            print("第%s个作品已完成" % str(n))
+            if upload_result == 'error':
+                os.remove(cookie_path)
+                print("账号未登录")
+                break
+            else:
+                print("第%s个作品已成功发布" % str(n))
+                
             # 删除article里的图片和article_path文件
             try:
-                os.remove(dialog["img"])
+                if 'default_img' not in dialog["img"]:
+                    os.remove(dialog["img"])
                 file_exists = True
             except FileNotFoundError:
                 file_exists = False

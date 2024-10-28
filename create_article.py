@@ -21,10 +21,16 @@ ua = {
         }
 def deal_img(img_folder,img_name):
     img_path = os.path.join(img_folder, f'{img_name}.jpg')
+    if not os.path.exists(img_path):
+        print(f"图片 {img_path} 不存在")
+        return ''
+        
     over_img_name = f"over_{img_name}.jpg"
     over_img_path = os.path.join(img_folder, over_img_name)
     # 打开图像文件
     img = Image.open(img_path)
+    if img is not None:
+        pass
     # 获取图像的宽度和高度
     width, height = img.size
     img.close()
@@ -153,10 +159,13 @@ def create_article(title,url,api_key):
         content = completion.choices[0].message.content
         print("已获取改写文章")
         # 下载文章图片
-        index = int(len(imgs)/2)
-        img = imgs[index]
-        download_image(img, img_folder,title)
-        dealt_img_path = deal_img(img_folder,title)
+        dealt_img_path = ''
+        if len(imgs) > 0:
+            print("下载文章配图")
+            index = int(len(imgs)/2)
+            img = imgs[index]
+            download_image(img, img_folder,title)
+            dealt_img_path = deal_img(img_folder,title)
         # 创建字典来存储要写入 JSON 文件的数据  
         data = {  
             'title': title,  
