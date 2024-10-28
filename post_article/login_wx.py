@@ -298,7 +298,7 @@ def run():
                 app = login_wx(60, cookie_path, dialog)
                 upload_result = asyncio.run(app.main())
             except Exception as e:
-                upload_result = 'error'
+                upload_result = 'other error'
                 print(f'上传报错：{e}')
 
             if upload_result == 'error':
