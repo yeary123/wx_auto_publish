@@ -305,7 +305,7 @@ def run():
                 os.remove(cookie_path)
                 print("账号未登录")
                 break
-            else:
+            elif upload_result == 'success':
                 print("第%s个作品已成功发布" % str(n))
                 
             # 删除article里的图片和article_path文件
