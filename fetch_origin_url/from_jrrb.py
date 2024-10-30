@@ -13,7 +13,7 @@ async def from_wy():
                    "Cronet/TTNetVersion:b4d74d15 2020-04-23 QuicVersion:0144d358 2020-03-24)"
         }
     async with async_playwright() as playwright:
-            browser = await playwright.chromium.launch(channel="chrome", headless=True)
+            browser = await playwright.chromium.launch(channel="chrome", headless=False)
             context = await browser.new_context(user_agent=ua["web"])
             page = await context.new_page()
             await page.add_init_script(path="stealth.min.js")
@@ -24,26 +24,21 @@ async def from_wy():
             parent_element = await page.query_selector_all("#app > div.__layout-1uk59wc-e.n-layout.n-layout--static-positioned.fixed > div > div.n-scrollbar-container > div > main > div > div.n-card.__card-1uk59wc-m.n-card--bordered.card > div.n-card__content > div > ul")
             # 获取parent_element的所有子元素
             child_elements = await parent_element[0].query_selector_all('li') if parent_element else []
-            titles = []
+            datas = []
             for child in child_elements:
-                # 获取child的某个 class = n-text __text-1uk59wc-d title 的元素的文本
-                title_element = await child.query_selector('.n-text.__text-1uk59wc-d.title')
-                title = await title_element.inner_text()
-                titles.append(title)
                 await child.click()
                 await page.wait_for_timeout(1000)
-            # 获取所有标签页的url
-            pages = context.pages
-            urls = [await page.evaluate("window.location.href") for page in pages]
-            
-            # 删除第一个元素
-            urls.remove(urls[0])
-            
-            # title 和 url 一一对应放进list里，字段名 title 和 href
-            data = [{"title": t, "href": u} for t, u in zip(titles, urls)]
-
-            package_base.write_to_txt(data, 'net_ease.txt')
-            print(urls)
+                news_page = context.pages[-1]
+                # 获取页面链接
+                href = await news_page.evaluate("window.location.href")
+                # 获取页面标题
+                title_element = await news_page.wait_for_selector('#contain > div.post_main > h1')
+                title = await title_element.inner_text()
+                # 一一对应，放入datas中
+                datas.append({"title": title, "href": href})
+            # 打印datas
+            print(datas)
+            package_base.write_to_txt(datas, 'net_ease.txt')
             # 关闭网页
             await context.close()
             await browser.close()
