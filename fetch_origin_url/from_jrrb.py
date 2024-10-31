@@ -27,15 +27,20 @@ async def from_wy():
             datas = []
             for child in child_elements:
                 await child.click()
-                await page.wait_for_timeout(1000)
+                await page.wait_for_timeout(2000)
                 news_page = context.pages[-1]
                 # 获取页面链接
                 href = await news_page.evaluate("window.location.href")
                 # 获取页面标题
-                title_element = await news_page.wait_for_selector('#contain > div.post_main > h1')
+                try:
+                    title_element = await news_page.wait_for_selector('#contain > div.post_main > h1')
+                except Exception as e:
+                    title_element = await news_page.wait_for_selector('#container > div.post_main > h1')
+                
                 title = await title_element.inner_text()
                 # 一一对应，放入datas中
                 datas.append({"title": title, "href": href})
+
             # 打印datas
             print(datas)
             package_base.write_to_txt(datas, 'net_ease.txt')

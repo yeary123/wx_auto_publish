@@ -1,9 +1,9 @@
-[2024-10-28 10:38:42,127]-login_wx.py-87-MainThread-账号未登录
-[2024-10-28 10:38:44,583]-login_wx.py-87-MainThread-账号未登录
-[2024-10-28 10:38:44,583]-login_wx.py-87-MainThread-账号未登录
-[2024-10-28 10:38:47,067]-login_wx.py-87-MainThread-账号未登录
-[2024-10-28 10:38:47,067]-login_wx.py-87-MainThread-账号未登录
-[2024-10-28 10:38:47,067]-login_wx.py-87-MainThread-账号未登录
-[2024-10-28 10:49:03,998]-login_wx.py-87-MainThread-账号未登录
-[2024-10-28 10:49:06,440]-login_wx.py-87-MainThread-账号未登录
-[2024-10-28 10:49:06,440]-login_wx.py-87-MainThread-账号未登录
+[2024-10-31 16:47:26,150]-warnings.py-109-MainThread-/Users/liqian/wx_login/post_article/check_login_wx.py:129: RuntimeWarning: coroutine 'login_wx.main' was never awaited
+  continue
+
+[2024-10-31 17:11:38,509]-warnings.py-109-MainThread-/Users/liqian/wx_login/post_article/clean_wx.py:48: RuntimeWarning: coroutine 'do_clean' was never awaited
+  do_clean(page)
+
+[2024-10-31 17:11:38,509]-warnings.py-109-MainThread-/Users/liqian/wx_login/post_article/clean_wx.py:48: RuntimeWarning: coroutine 'do_clean' was never awaited
+  do_clean(page)
+

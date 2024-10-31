@@ -165,7 +165,7 @@ class login_wx(wx):
             except Exception as e:
                 print(f'点击定时异常：{e}')
             try:    
-                set_publish_time1 = await new_page.wait_for_selector('#vue_app > div:nth-child(5) > div.new_mass_send_dialog > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__bd > div > div > form > div.mass-send__td-setting.timer_setting > div > div > div.mass-send__timer-wrp > label')
+                set_publish_time1 = await new_page.wait_for_selector('#vue_app > div:nth-child(5) > div.new_mass_send_dialog > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__bd > div > div > form > div.mass-send__td-setting.timer_setting > div > div > div.mass-send__timer-wrp > label',timeout=5000)
                 await set_publish_time1.click()
             except Exception as e:
                 print(f'点击定时异常1：{e}')

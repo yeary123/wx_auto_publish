@@ -9,3 +9,11 @@ API_KEY = ['sk-faToKywH9lLKlmEIiPT3n7zw2dIfnshx9h74SOkFaItVQ604',
        'sk-ukAAC85Z01TkfQpV6VRAEuuIrbJJzHti4mwIH8oAnOb5OofI',
        'sk-2H49yH7dlVwMYNBMtCjFtfsTvugdBHvCh8HK0ZyUeFTBy5kg'
        ]
+
+UA = {
+            "web": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 "
+                   "Safari/537.36",
+            "app": "com.ss.android.ugc.aweme/110101 (Linux; U; Android 5.1.1; zh_CN; MI 9; Build/NMF26X; "
+                   "Cronet/TTNetVersion:b4d74d15 2020-04-23 QuicVersion:0144d358 2020-03-24)"
+        }
+
