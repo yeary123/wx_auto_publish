@@ -21,7 +21,7 @@ def delete_all_files(folder_path):
     except:
         print("delete_all_files except")
 
-class wx():
+class jrtt():
     def __init__(self):
         config_log()
         self.title = ""
@@ -44,7 +44,7 @@ class wx():
         return browser
 
 
-class login_jrtt(wx):
+class login_jrtt(jrtt):
     def __init__(self, cookie_file: str):
         super(login_jrtt, self).__init__()
         self.cookie_file = cookie_file
