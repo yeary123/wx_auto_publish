@@ -62,7 +62,7 @@ async def do_clean(page):
 
 async def clean_history(cookie_path):
       async with async_playwright() as playwright:
-            browser = browser = await playwright.chromium.launch(headless=False,
+            browser = await playwright.chromium.launch(headless=False,
                                           chromium_sandbox=False,
                                           ignore_default_args=["--enable-automation"],
                                           channel="chrome"

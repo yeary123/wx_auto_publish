@@ -57,7 +57,7 @@ class login_jrtt(wx):
             await page.add_init_script(path="stealth.min.js")
             await page.goto("https://www.toutiao.com/")
             print("开始判断账号是否登录")
-            avatar = await page.query_selector(".user-icon.red")
+            avatar = await page.query_selector("#root > div > div.toutiao-header > div.header-right.common-component-wrapper > div.user-icon > a")
             if avatar is None:
                 # 删掉cookie文件
                 try:
@@ -129,4 +129,4 @@ async def check_log_state():
             print("没有登录账号，程序退出")
             exit()
 
-asyncio.run(check_log_state())
+# asyncio.run(check_log_state())
