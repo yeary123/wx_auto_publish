@@ -4,7 +4,7 @@ from moviepy.editor import *
 from playwright.async_api import Playwright, async_playwright
 sys.path.append(os.getcwd())
 from base.logs import config_log
-import post_article.get_wx_cookie as get_wx_cookie
+import post_article.get_jrtt_cookie as get_jrtt_cookie
 import const 
 
   
@@ -44,9 +44,9 @@ class wx():
         return browser
 
 
-class login_wx(wx):
+class login_jrtt(wx):
     def __init__(self, cookie_file: str):
-        super(login_wx, self).__init__()
+        super(login_jrtt, self).__init__()
         self.cookie_file = cookie_file
         
     async def login(self) -> bool:
@@ -55,9 +55,10 @@ class login_wx(wx):
             context = await browser.new_context(storage_state=self.cookie_file, user_agent=const.UA["web"])
             page = await context.new_page()
             await page.add_init_script(path="stealth.min.js")
-            await page.goto("https://mp.weixin.qq.com/")
+            await page.goto("https://www.toutiao.com/")
             print("开始判断账号是否登录")
-            if "token" not in page.url:
+            avatar = await page.query_selector(".user-icon.red")
+            if avatar is None:
                 # 删掉cookie文件
                 try:
                     os.remove(self.cookie_file)
@@ -85,16 +86,16 @@ def find_file(path, file_type) -> list:
 
 def find_cookie():
     current_directory = os.path.dirname(sys.argv[0])
-    path = os.path.join(current_directory, 'wx_cookie')
+    path = os.path.join(current_directory, 'jrtt_cookie')
     return find_file(path, "json")
 
 async def check_log_state():
-    print("开始检查微信公众号账号登录情况")
+    print("开始检查今日头条账号登录情况")
     cookie_list = find_cookie()
     # 没有cookie文件
     if len(cookie_list) == 0:
         print("未找到cookie文件，请先登录")
-        get_wx_cookie.main()
+        get_jrtt_cookie.main()
         cookie_list = find_cookie()
         if len(cookie_list) > 0:
             print("已有[%s]个账号成功登陆" % len(cookie_list))
@@ -107,7 +108,7 @@ async def check_log_state():
             author = cookie_name.split("_")[1][:-5]
             print("正在检查[%s]账号登录情况，当前序号[%s]" % (author, str(index)))
             try:
-                result = await login_wx(cookie_path).login()
+                result = await login_jrtt(cookie_path).login()
                 if result == True:
                     print("账号[%s]登录成功" % author)
                 else:
@@ -127,3 +128,5 @@ async def check_log_state():
         else:
             print("没有登录账号，程序退出")
             exit()
+
+asyncio.run(check_log_state())

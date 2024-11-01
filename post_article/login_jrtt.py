@@ -8,7 +8,7 @@ sys.path.append(os.getcwd())
 from base.logs import config_log
 from datetime import datetime, timedelta
 import json
-import post_article.get_jrtt_cooke as get_jrtt_cooke
+import post_article.get_jrtt_cookie as get_jrtt_cookie
 import create_article
 
   
@@ -235,7 +235,7 @@ def run():
     article_list = find_file("json", "json")
     if len(cookie_list) == 0:
         print("未找到cookie文件，请先运行get_jrtt_cookie.py")
-        get_jrtt_cooke.main()
+        get_jrtt_cookie.main()
         cookie_list = find_file("jrrt_cookie", "json")
     if len(article_list) == 0:
         print("未找到article文件，请先运行create_article.py")

@@ -3,6 +3,7 @@
 import asyncio
 import os
 from playwright.async_api import Playwright, async_playwright
+import sys
 
 
 class creator_wx():
@@ -14,11 +15,11 @@ class creator_wx():
         """
         self.timeout = timeout * 1000
         self.email = email
-        self.path = os.path.abspath('')
+        self.path = os.path.dirname(sys.argv[0])
         self.desc = "cookie_%s.json" % email
 
-        if not os.path.exists(os.path.join(self.path, "jrrt_cookie")):
-            os.makedirs(os.path.join(self.path, "jrrt_cookie"))
+        if not os.path.exists(os.path.join(self.path, "jrtt_cookie")):
+            os.makedirs(os.path.join(self.path, "jrtt_cookie"))
 
     async def __cookie(self, playwright: Playwright) -> None:
         browser = await playwright.chromium.launch(channel="chrome", headless=False)
@@ -40,7 +41,7 @@ class creator_wx():
             try:
                 # cookie_txt.index("ua_id")
                 print(self.email + " ——> 登录成功")
-                await context.storage_state(path=os.path.join(self.path, "cookie", self.desc))
+                await context.storage_state(path=os.path.join(self.path, "jrtt_cookie", self.desc))
             except ValueError:
                 print(self.email + " ——> 登录失败，本次操作不保存cookie")
         except Exception as e:
