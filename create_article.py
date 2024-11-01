@@ -97,6 +97,7 @@ def get_article_txt_img(url):
             page = context.new_page() 
             page.add_init_script(path="stealth.min.js")
             page.goto(url)  # 替换为目标 URL  
+            page.wait_for_timeout(2000)
             # 获取网页的html文本
             try:
                 html = page.content()
@@ -105,11 +106,15 @@ def get_article_txt_img(url):
             
             # 如果url包含 www.163.com，则需要playwright找到特定元素
             if 'www.163.com' in url:
-                parent_element_handle = page.query_selector('#content > div.post_body')  
+                parent_element_handle = page.wait_for_selector('#content > div.post_body')  
                 # 获取父元素的 HTML 内容  
                 parent_html = parent_element_handle.inner_html()
                 html = parent_html
-            
+            if 'www.toutiao.com' in url:
+                parent_element_handle = page.wait_for_selector('#root > div.article-detail-container > div.main > div:nth-child(1) > div > div > div > div > article')  
+                # 获取父元素的 HTML 内容  
+                parent_html = parent_element_handle.inner_html()
+                html = parent_html
             
             # 关闭浏览器  
             browser.close()  
@@ -140,7 +145,8 @@ def create_article(title,url,api_key):
     if txt == "ERROR":
         return ''
     
-    content = f'请阅读这篇文字：${txt} 请根据下面的提示进行改写。
+    content = f'''请阅读这篇文字：${txt} 
+请根据下面的提示进行改写。
 这篇文字是从一个网页上摘录下来的，有一篇文章的主体内容，还有一些无关内容。请甄别并删除无关内容。
 明白文章表达的意思，抓住其主旨，将文章改写成200字左右短文。
 使用平易近人的语言，使文章更加亲切和易于理解；使用简单和通俗易懂的词汇，不要使用专业术语。
@@ -148,7 +154,7 @@ def create_article(title,url,api_key):
 使用口语化、接地气、人情味、富有情感等等语气。
 段落过度要自然、逻辑清晰。不要使用“首先、其次、再次、然后、最后”这些副词和过渡词。
 文章中要加入更多具体的例子、生动的描述和感官细节等。
-不要出现作者表达了、文章主旨是之类的表述。我们的读者是不知道有原文章的。'
+不要出现作者表达了、文章主旨是之类的表述。我们的读者是不知道有原文章的。'''
 
     client = OpenAI(
         api_key=api_key, # 在这里将 MOONSHOT_API_KEY 替换为你从 Kimi 开放平台申请的 API Key
