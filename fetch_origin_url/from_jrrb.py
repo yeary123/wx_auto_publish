@@ -33,9 +33,17 @@ async def from_wy():
                 href = await news_page.evaluate("window.location.href")
                 # 获取页面标题
                 try:
-                    title_element = await news_page.wait_for_selector('#contain > div.post_main > h1')
+                    title_element = await news_page.wait_for_selector('#contain > div.post_main > h1',timeout=5000)
                 except Exception as e:
-                    title_element = await news_page.wait_for_selector('#container > div.post_main > h1')
+                    print(e)
+
+                try:
+                    title_element = await news_page.wait_for_selector('#container > div.post_main > h1',timeout=5000)
+                except Exception as e:
+                    print(e)
+                
+                if title_element is None:
+                    continue
                 
                 title = await title_element.inner_text()
                 # 一一对应，放入datas中

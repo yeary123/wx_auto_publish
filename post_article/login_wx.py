@@ -11,6 +11,7 @@ import json
 import post_article.get_wx_cookie as get_wx_cookie
 import create_article
 import random
+from assets import *
 
   
 def delete_all_files(folder_path):
@@ -196,31 +197,6 @@ class login_wx(wx):
     async def main(self):
         await self.login()
 
-
-# 文件查找 path 绝对路径， file_type 文件类型
-def find_file(path, file_type) -> list:
-    if not os.path.exists(path):
-        os.makedirs(path)
-    data_list = []
-    for root, dirs, files in os.walk(path):
-        if root != path:
-            break
-        for file in files:
-            file_path = os.path.join(root, file)
-            if file_path.find(file_type) != -1:
-                data_list.append(file_path)
-    return data_list
-
-def find_cookie():
-    current_directory = os.path.dirname(sys.argv[0])
-    path = os.path.join(current_directory, 'wx_cookie')
-    return find_file(path, "json")
-
-def find_article():
-    father_path = os.path.abspath("")
-    path = os.path.join(father_path, 'json')
-    return find_file(path, "json")
-
 def get_target_time(n):
     # 获取当前时间
     current_time = datetime.now()
@@ -236,12 +212,12 @@ def get_target_time(n):
     return formatted_target_time
 
 def run():
-    cookie_list = find_cookie()
+    cookie_list = find_cookie('wx_cookie')
     article_list = find_article()
     if len(cookie_list) == 0:
         print("未找到cookie文件，请先运行get_wx_cookie.py")
         get_wx_cookie.main()
-        cookie_list = find_cookie()
+        cookie_list = find_cookie('wx_cookie')
     if len(article_list) == 0:
         print("未找到article文件，请先运行create_article.py")
         create_article.main()

@@ -6,6 +6,7 @@ sys.path.append(os.getcwd())
 from base.logs import config_log
 import post_article.get_jrtt_cookie as get_jrtt_cookie
 import const 
+from assets import *
 
   
 def delete_all_files(folder_path):
@@ -69,34 +70,14 @@ class login_jrtt(jrtt):
             await browser.close()
             return True
 
-
-# 文件查找 path 绝对路径， file_type 文件类型
-def find_file(path, file_type) -> list:
-    if not os.path.exists(path):
-        os.makedirs(path)
-    data_list = []
-    for root, dirs, files in os.walk(path):
-        if root != path:
-            break
-        for file in files:
-            file_path = os.path.join(root, file)
-            if file_path.find(file_type) != -1:
-                data_list.append(file_path)
-    return data_list
-
-def find_cookie():
-    current_directory = os.path.dirname(sys.argv[0])
-    path = os.path.join(current_directory, 'jrtt_cookie')
-    return find_file(path, "json")
-
 async def check_log_state():
     print("开始检查今日头条账号登录情况")
-    cookie_list = find_cookie()
+    cookie_list = find_cookie('jrtt_cookie')
     # 没有cookie文件
     if len(cookie_list) == 0:
         print("未找到cookie文件，请先登录")
         get_jrtt_cookie.main()
-        cookie_list = find_cookie()
+        cookie_list = find_cookie('jrtt_cookie')
         if len(cookie_list) > 0:
             print("已有[%s]个账号成功登陆" % len(cookie_list))
         else:
@@ -122,7 +103,7 @@ async def check_log_state():
                     pass
                 print("账号[%s]登录失败" % author)
                 continue
-        cookie_list = find_cookie()
+        cookie_list = find_cookie('jrtt_cookie')
         if len(cookie_list) > 0:
             print("已有[%s]个账号成功登陆" % len(cookie_list))
         else:

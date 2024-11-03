@@ -5,7 +5,8 @@ from playwright.async_api import Playwright, async_playwright
 sys.path.append(os.getcwd())
 from base.logs import config_log
 import post_article.get_wx_cookie as get_wx_cookie
-import const 
+import const
+from assets import *
 
   
 def delete_all_files(folder_path):
@@ -83,19 +84,14 @@ def find_file(path, file_type) -> list:
                 data_list.append(file_path)
     return data_list
 
-def find_cookie():
-    current_directory = os.path.dirname(sys.argv[0])
-    path = os.path.join(current_directory, 'wx_cookie')
-    return find_file(path, "json")
-
 async def check_log_state():
     print("开始检查微信公众号账号登录情况")
-    cookie_list = find_cookie()
+    cookie_list = find_cookie('wx_cookie')
     # 没有cookie文件
     if len(cookie_list) == 0:
         print("未找到cookie文件，请先登录")
         get_wx_cookie.main()
-        cookie_list = find_cookie()
+        cookie_list = find_cookie('wx_cookie')
         if len(cookie_list) > 0:
             print("已有[%s]个账号成功登陆" % len(cookie_list))
         else:
@@ -121,7 +117,7 @@ async def check_log_state():
                     pass
                 print("账号[%s]登录失败" % author)
                 continue
-        cookie_list = find_cookie()
+        cookie_list = find_cookie('wx_cookie')
         if len(cookie_list) > 0:
             print("已有[%s]个账号成功登陆" % len(cookie_list))
         else:

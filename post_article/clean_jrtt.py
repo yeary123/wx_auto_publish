@@ -5,6 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) 
 import const
 import check_login_jrtt as self
 import asyncio
+from assets import *
 
 # 滚动页面的函数
 async def scroll_page(page):
@@ -80,7 +81,7 @@ async def clean_history(cookie_path):
 
 def clean():
     asyncio.run(self.check_log_state())
-    cookie_list = self.find_cookie()
+    cookie_list = find_cookie('jrtt_cookie')
     for index,cookie_path in enumerate(cookie_list):
         cookie_name: str = os.path.basename(cookie_path)
         author = cookie_name.split("_")[1][:-5]

@@ -5,6 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) 
 import const
 import check_login_wx as self
 import asyncio
+from assets import *
 
 
 async def do_clean(page):
@@ -77,7 +78,7 @@ async def clean_history(cookie_path):
 
 def clean():
 #     asyncio.run(self.check_log_state())
-    cookie_list = self.find_cookie()
+    cookie_list = find_cookie('wx_cookie')
     for cookie_path in cookie_list:
         asyncio.run(clean_history(cookie_path))
 
