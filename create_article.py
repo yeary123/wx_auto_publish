@@ -11,6 +11,14 @@ from playwright.sync_api import sync_playwright
 output_folder = 'json'  
 img_folder = 'img'
 input_folder = 'origin_data'
+keji_folder = 'origin_data/keji_data'
+caijing_folder = 'origin_data/caijing_data'
+junshi_folder = 'origin_data/junshi_data'
+tiyu_folder = 'origin_data/tiyu_data'
+lishi_folder = 'origin_data/lishi_data'
+meishi_folder = 'origin_data/meishi_data'
+lvyou_folder = 'origin_data/lvyou_data'
+
 # 获取当前文件的完整路径  
 current_file_path = __file__ 
 ua = {
@@ -105,17 +113,18 @@ def get_article_txt_img(url):
                 print(e)
             
             # 如果url包含 www.163.com，则需要playwright找到特定元素
+            toutiao_content_selector = '#root > div.article-detail-container > div.main > div:nth-child(1) > div > div > div > div > article'
             if 'www.163.com' in url:
-                parent_element_handle = page.wait_for_selector('#content > div.post_body')  
-                # 获取父元素的 HTML 内容  
-                parent_html = parent_element_handle.inner_html()
-                html = parent_html
-            if 'www.toutiao.com' in url:
-                parent_element_handle = page.wait_for_selector('#root > div.article-detail-container > div.main > div:nth-child(1) > div > div > div > div > article')  
-                # 获取父元素的 HTML 内容  
-                parent_html = parent_element_handle.inner_html()
-                html = parent_html
+                parent_element_handle = page.wait_for_selector('#content > div.post_body')                  
+            elif 'www.toutiao.com' in url:
+                parent_element_handle = page.wait_for_selector(toutiao_content_selector)  
+            elif 'www.36kr.com' in url:
+                input_folder = keji_folder
+                parent_element_handle = page.wait_for_selector('#app > div > div.box-kr-article-new-y > div > div.kr-layout-main.clearfloat > div.main-right > div > div > div > div.article-detail-wrapper-box > div > div.article-left-container > div.article-content > div > div > div.common-width.margin-bottom-20 > div')  
             
+            if parent_element_handle is not None:
+                html = parent_element_handle.inner_html()
+
             # 关闭浏览器  
             browser.close()  
                 
