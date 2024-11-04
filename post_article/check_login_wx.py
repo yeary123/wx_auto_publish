@@ -90,7 +90,7 @@ async def check_log_state():
     # 没有cookie文件
     if len(cookie_list) == 0:
         print("未找到cookie文件，请先登录")
-        get_wx_cookie.main()
+        await get_wx_cookie.main()
         cookie_list = find_cookie('wx_cookie')
         if len(cookie_list) > 0:
             print("已有[%s]个账号成功登陆" % len(cookie_list))
@@ -123,3 +123,5 @@ async def check_log_state():
         else:
             print("没有登录账号，程序退出")
             exit()
+
+asyncio.run(check_log_state())
