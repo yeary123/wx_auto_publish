@@ -124,4 +124,4 @@ async def check_log_state():
             print("没有登录账号，程序退出")
             exit()
 
-asyncio.run(check_log_state())
+# asyncio.run(check_log_state())

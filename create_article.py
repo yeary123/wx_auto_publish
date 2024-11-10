@@ -6,27 +6,16 @@ import json
 import os 
 from PIL import Image
 from playwright.sync_api import sync_playwright
+from const import *
 
 # 指定输出文件夹名称  
 output_folder = 'json'  
 img_folder = 'img'
 input_folder = 'origin_data'
-keji_folder = 'origin_data/keji_data'
-caijing_folder = 'origin_data/caijing_data'
-junshi_folder = 'origin_data/junshi_data'
-tiyu_folder = 'origin_data/tiyu_data'
-lishi_folder = 'origin_data/lishi_data'
-meishi_folder = 'origin_data/meishi_data'
-lvyou_folder = 'origin_data/lvyou_data'
 
 # 获取当前文件的完整路径  
 current_file_path = __file__ 
-ua = {
-            "web": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 "
-                   "Safari/537.36",
-            "app": "com.ss.android.ugc.aweme/110101 (Linux; U; Android 5.1.1; zh_CN; MI 9; Build/NMF26X; "
-                   "Cronet/TTNetVersion:b4d74d15 2020-04-23 QuicVersion:0144d358 2020-03-24)"
-        }
+
 def deal_img(img_folder,img_name):
     img_path = os.path.join(img_folder, f'{img_name}.jpg')
     if not os.path.exists(img_path):
@@ -101,11 +90,11 @@ def get_article_txt_img(url):
                                         chromium_sandbox=False,
                                             ignore_default_args=["--enable-automation"],
                                             channel="chrome")  # 你可以设置为 headless=True 以在无头模式下运行  
-            context = browser.new_context(user_agent=ua["web"])
+            context = browser.new_context(user_agent = UA["web"])
             page = context.new_page() 
             page.add_init_script(path="stealth.min.js")
             page.goto(url)  # 替换为目标 URL  
-            page.wait_for_timeout(2000)
+            page.wait_for_timeout(5000)
             # 获取网页的html文本
             try:
                 html = page.content()
@@ -119,7 +108,6 @@ def get_article_txt_img(url):
             elif 'www.toutiao.com' in url:
                 parent_element_handle = page.wait_for_selector(toutiao_content_selector)  
             elif 'www.36kr.com' in url:
-                input_folder = keji_folder
                 parent_element_handle = page.wait_for_selector('#app > div > div.box-kr-article-new-y > div > div.kr-layout-main.clearfloat > div.main-right > div > div > div > div.article-detail-wrapper-box > div > div.article-left-container > div.article-content > div > div > div.common-width.margin-bottom-20 > div')  
             
             if parent_element_handle is not None:
@@ -157,7 +145,7 @@ def create_article(title,url,api_key):
     content = f'''请阅读这篇文字：${txt} 
 请根据下面的提示进行改写。
 这篇文字是从一个网页上摘录下来的，有一篇文章的主体内容，还有一些无关内容。请甄别并删除无关内容。
-明白文章表达的意思，抓住其主旨，将文章改写成200字左右短文。
+明白文章表达的意思，抓住其主旨，将文章改写成200字左右短文，每个段落不要超过50字。
 使用平易近人的语言，使文章更加亲切和易于理解；使用简单和通俗易懂的词汇，不要使用专业术语。
 要使用短句，不要使用长句，不要冗长描述，便于阅读和理解。
 使用口语化、接地气、人情味、富有情感等等语气。
@@ -212,7 +200,7 @@ def deal_urls(dir_path):
     
     if len(txt_files) == 0:
         print("没有txt文件数据，请先获取文章链接")
-        return
+        exit()
     
     result = []
     # 遍历并读取每个 .txt 文件  
@@ -235,8 +223,8 @@ def deal_urls(dir_path):
         # 大模型限制，不能过于频繁调用
         time.sleep(30/count)
 
-def main():
+def start_create_article():
     deal_urls(input_folder)
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     start_create_article()

@@ -19,3 +19,12 @@ UA = {
                    "Cronet/TTNetVersion:b4d74d15 2020-04-23 QuicVersion:0144d358 2020-03-24)"
         }
 
+MILITARY = "military"
+FINANCE = "finance"
+TECH = "tech"
+SPORTS = "sports"
+HISTORY = "history"
+FOOD = "food"
+TRAVEL = "travel"
+HOT = "hot"
+ENTERTAINMENT = "entertainment"

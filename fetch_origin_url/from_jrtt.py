@@ -2,16 +2,20 @@ from playwright.async_api import async_playwright
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))  # 添加项目根目录到sys.path
-import const
+from const import *
 import asyncio
 import package_base
-from enum import Enum
 
-class area_selector(Enum):
-    CAIJING = '#root > div > div.main-content > div.left-container > div > div > div > div.main-nav-wrapper > div > ul > li:nth-child(5)'
-    KEJI = '#root > div > div.main-content > div.left-container > div > div > div > div.main-nav-wrapper > div > ul > li:nth-child(6)'
-    JUNSHI = '#root > div > div.main-content > div.left-container > div > div > div > div.main-nav-wrapper > div > ul > li:nth-child(8)'
-    
+base_url = "https://www.toutiao.com/?channel="
+military_url = base_url + MILITARY
+finance_url = base_url + FINANCE
+tech_url = base_url + TECH
+sports_url = base_url + SPORTS
+history_url = base_url + HISTORY
+food_url = base_url + FOOD
+travel_url = base_url + TRAVEL
+hot_url = base_url + HOT
+entertainment_url = base_url + ENTERTAINMENT
 
 async def scroll_page(page):
     await page.evaluate("""
@@ -58,5 +62,3 @@ async def goto_page(area):
         
         # 关掉浏览器
         await browser.close()
-
-asyncio.run(goto_page(area_selector.CAIJING))

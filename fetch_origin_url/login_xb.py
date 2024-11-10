@@ -8,6 +8,7 @@ sys.path.append(os.getcwd())
 from base.config import conigs
 from base.logs import config_log
 import package_base
+from const import *
 
 # 获取当前文件的完整路径  
 current_file_path = __file__  
@@ -97,7 +98,7 @@ class login_xb(xb):
             a_tags_data = await get_all_a_tags(page)  
             print('抓取其中的文章名和链接')
             # 将结果写入 txt 文件  
-            package_base.write_to_txt(a_tags_data, 'xb_output.txt','weixin')  
+            package_base.write_to_txt(a_tags_data, 'xb_output.txt', second_folder_name = HOT, url_filter = 'weixin')  
 
             time.sleep(10)
 
