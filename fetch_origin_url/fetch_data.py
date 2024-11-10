@@ -1,6 +1,7 @@
 from from_jrrb import *
 import asyncio
 from package_base import *
+from from_jrtt import *
 def fetch_data():
     print("-->删掉所有旧数据")
     delete_all_origin_datas()
@@ -16,6 +17,8 @@ def fetch_data():
     asyncio.run(from_itzhijia())
     print("从澎湃获取数据")
     asyncio.run(from_pengpai())
+    print("从今日头条获取数据")
+    asyncio.run(from_jrtt())
     print("-->获取数据完成")
     
 fetch_data()
