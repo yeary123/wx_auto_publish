@@ -8,10 +8,7 @@ from PIL import Image
 from playwright.sync_api import sync_playwright
 from const import *
 
-# 指定输出文件夹名称  
-output_folder = 'json'  
-img_folder = 'img'
-input_folder = 'origin_data'
+data_folder = 'origin_data'
 
 # 获取当前文件的完整路径  
 current_file_path = __file__ 
@@ -26,8 +23,6 @@ def deal_img(img_folder,img_name):
     over_img_path = os.path.join(img_folder, over_img_name)
     # 打开图像文件
     img = Image.open(img_path)
-    if img is not None:
-        pass
     # 获取图像的宽度和高度
     width, height = img.size
     img.close()
@@ -136,12 +131,7 @@ def get_article_txt_img(url):
         return ("ERROR",[])
 
     
-def create_article(title,url,api_key): 
-    # 获取文章内容和图片
-    (txt,imgs) = get_article_txt_img(url)
-    if txt == "ERROR":
-        return ''
-    
+def create_article(txt,api_key): 
     content = f'''请阅读这篇文字：${txt} 
 请根据下面的提示进行改写。
 这篇文字是从一个网页上摘录下来的，有一篇文章的主体内容，还有一些无关内容。请甄别并删除无关内容。
@@ -154,8 +144,8 @@ def create_article(title,url,api_key):
 不要出现作者表达了、文章主旨是之类的表述。我们的读者是不知道有原文章的。'''
 
     client = OpenAI(
-        api_key=api_key, # 在这里将 MOONSHOT_API_KEY 替换为你从 Kimi 开放平台申请的 API Key
-        base_url="https://api.moonshot.cn/v1",
+        api_key = api_key, # 在这里将 MOONSHOT_API_KEY 替换为你从 Kimi 开放平台申请的 API Key
+        base_url = "https://api.moonshot.cn/v1",
     )
     try:
         completion = client.chat.completions.create(
@@ -168,63 +158,80 @@ def create_article(title,url,api_key):
         )
         # 通过 API 我们获得了 Kimi 大模型给予我们的回复消息（role=assistant）
         content = completion.choices[0].message.content
-        print("已获取改写文章")
-        # 下载文章图片
-        dealt_img_path = ''
-        if len(imgs) > 0:
-            print("下载文章配图")
-            index = int(len(imgs)/2)
-            img = imgs[index]
-            download_image(img, img_folder,title)
-            dealt_img_path = deal_img(img_folder,title)
-        # 创建字典来存储要写入 JSON 文件的数据  
-        data = {  
-            'title': title,  
-            'content': content,
-            'img': dealt_img_path  
-        }   
-        os.makedirs(output_folder, exist_ok=True)  
-        # 将字典写入 JSON 文件  
-        with open(f'{output_folder}/{title}.json', 'w', encoding='utf-8') as json_file:  
-            json.dump(data, json_file, ensure_ascii=False, indent=4)  
-        print("已写入json")
+        return content
     except Exception as e:
-        print(f'调用大模型 or 写入json 出问题:{e}')
+        print(f'调用大模型出问题:{e}')
+        return None
+
+def find_txt_files(path):
+    txt_files = []
+
+    # 遍历指定路径下的所有文件和子目录
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            # 检查文件是否是.txt文件
+            if file.endswith('.txt'):
+                # 拼接文件完整路径
+                full_path = os.path.join(root, file)
+                # 添加到结果列表
+                txt_files.append(full_path)
+
+    return txt_files
 
 def deal_urls(dir_path):
     # 获取当前文件夹下的所有文件  
-    files = os.listdir(dir_path)  
+    files_path = find_txt_files(dir_path)  
     
-    # 筛选以 .txt 结尾的文件  
-    txt_files = [f for f in files if f.endswith('.txt')]  
-    
-    if len(txt_files) == 0:
+    if len(files_path) == 0:
         print("没有txt文件数据，请先获取文章链接")
         exit()
     
     result = []
     # 遍历并读取每个 .txt 文件  
-    for txt_file in txt_files:  
-        # 构建文件的完整路径  
-        file_path = os.path.join(dir_path, txt_file)  
-        # 读取文件内容（这里以打印为例）  
-        with open(file_path, 'r', encoding='utf-8') as txt_file:  
-            result = read_txt_to_dict(file_path)
-    # 遍历结果        
-    for index,item in enumerate(result):
-        title = item['title']  
-        url = item['url']  
-        print(f'开始处理文章：{title}')
-        # 从constants.py中获取API_KEY
-        from const import API_KEY
-        count = len(API_KEY)
-        api_key = API_KEY[index % count]
-        create_article(title,url,api_key)
-        # 大模型限制，不能过于频繁调用
-        time.sleep(30/count)
+    for path in files_path: 
+        # 获取path对应的文件夹名
+        folder_name = os.path.dirname(path)
+        result = read_txt_to_dict(path)
+        # 遍历结果        
+        for index,item in enumerate(result):
+            title = item['title']  
+            url = item['url']  
+            print(f'-->开始处理文章：{title}')
+            # 获取文章内容和图片
+            (txt,imgs) = get_article_txt_img(url)
+            if txt == "ERROR":
+                print("获取文章失败")
+                continue
+            # 从constants.py中获取API_KEY
+            count = len(API_KEY)
+            api_key = API_KEY[index % count]
+            article = create_article(txt,api_key)
+            if article is None or article == "":
+                continue
+            # 下载文章图片
+            dealt_img_path = ''
+            if len(imgs) > 0:
+                print("下载文章配图")
+                index = int(len(imgs)/2)
+                img = imgs[index]
+                download_image(img, folder_name,title)
+                dealt_img_path = deal_img(folder_name,title)
+            # 创建字典来存储要写入 JSON 文件的数据  
+            data = {  
+                'title': title,  
+                'content': article,
+                'img': dealt_img_path  
+            }   
+            os.makedirs(data_folder, exist_ok=True)  
+            # 将字典写入 JSON 文件  
+            with open(f'{folder_name}/{title}.json', 'w', encoding='utf-8') as json_file:  
+                json.dump(data, json_file, ensure_ascii=False, indent=4)  
+            print(f"-->文章处理完成，已写入json文件：{title}.json")
+            # 大模型限制，不能过于频繁调用
+            time.sleep(30/count)
 
 def start_create_article():
-    deal_urls(input_folder)
+    deal_urls(data_folder)
 
-# if __name__ == '__main__':
-#     start_create_article()
+if __name__ == '__main__':
+    start_create_article()
