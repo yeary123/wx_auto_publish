@@ -1,6 +1,8 @@
 import os
 import sys
 
+# 获取当前文件的绝对路径
+current_file_abspath = os.path.abspath(__file__)
 # 查找文件夹下所有文件
 def find_file(path, file_type) -> list:
     if not os.path.exists(path):
@@ -16,7 +18,7 @@ def find_file(path, file_type) -> list:
     return data_list
 
 def find_cookie(folder_name):
-    current_directory = os.path.dirname(sys.argv[0])
+    current_directory = os.path.dirname(os.path.abspath(__file__))
     path = os.path.join(current_directory, folder_name)
     return find_file(path, "json")
 
