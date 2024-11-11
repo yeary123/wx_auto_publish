@@ -1,13 +1,14 @@
-import asyncio
-import logging
+import sys
+import os
+sys.path.append(os.getcwd())
 from moviepy.editor import *
 from playwright.async_api import Playwright, async_playwright
 sys.path.append(os.getcwd())
 from base.logs import config_log
 import post_article.get_wx_cookie as get_wx_cookie
 import const
-from . import assets
-from .assets import *
+import asyncio
+from post_article.assets import *
 
   
 def delete_all_files(folder_path):
