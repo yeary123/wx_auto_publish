@@ -7,6 +7,7 @@ import os
 from PIL import Image
 from playwright.sync_api import sync_playwright
 from const import *
+import re
 
 data_folder = 'origin_data'
 
@@ -136,7 +137,7 @@ def create_article(txt,api_key):
     content = f'''请阅读这篇文字：${txt} 
 请根据下面的提示进行改写。
 这篇文字是从一个网页上摘录下来的，有一篇文章的主体内容，还有一些无关内容。请甄别并删除无关内容。
-明白文章表达的意思，抓住其主旨，将文章改写成200字左右短文，每个段落不要超过50字。
+明白文章表达的意思，抓住其主旨，将文章改写成200字左右短文，每个段落不要超过40字。
 使用平易近人的语言，使文章更加亲切和易于理解；使用简单和通俗易懂的词汇，不要使用专业术语。
 要使用短句，不要使用长句，不要冗长描述，便于阅读和理解。
 使用口语化、接地气、人情味、富有情感等等语气。
@@ -159,7 +160,8 @@ def create_article(txt,api_key):
         )
         # 通过 API 我们获得了 Kimi 大模型给予我们的回复消息（role=assistant）
         content = completion.choices[0].message.content
-        return content
+        normalized_text = re.sub(r'\n+', '\n', content)
+        return normalized_text
     except Exception as e:
         print(f'调用大模型出问题:{e}')
         return None
@@ -234,5 +236,5 @@ def deal_urls(dir_path):
 def start_create_article():
     deal_urls(data_folder)
 
-if __name__ == '__main__':
-    start_create_article()
+# if __name__ == '__main__':
+#     start_create_article()

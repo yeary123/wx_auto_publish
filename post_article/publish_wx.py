@@ -1,9 +1,10 @@
 import asyncio
-from check_login_wx import *
+from . import check_login_wx
+from .check_login_wx import *
 import os
 import json
 import random
-from assets import *
+from .assets import *
 from create_article import *
 from datetime import datetime, timedelta
     
@@ -84,7 +85,7 @@ async def publish(cookie_file,dialogs) -> str:
             print(f"正在保存第{index}篇文章")
             if index != 0:
                 # 新建一条消息
-                new_article_btn = await page.wait_for_selector('#add_appmsg_container > div')
+                new_article_btn = await new_page.wait_for_selector('#js_add_appmsg > i')
                 await new_article_btn.hover()
                 time.sleep(1)
                 # 点击 写新文章 按钮
@@ -176,7 +177,7 @@ async def publish(cookie_file,dialogs) -> str:
         return 'success'
 
 
-async def main():
+async def upload():
     # 调用check_log_state函数检查登录状态
     await check_log_state()
 
@@ -206,16 +207,20 @@ async def main():
                 "author": author,
                 "content": article["content"],
                 "img": img,
-                "time": ''
+                "time": '',
+                "article_path": article_path
             }
             dialogs.append(dialog)
-            
-        publish_result = await publish(cookie_path,dialogs)
+            if len(dialogs) >= MAX_NUM_PER_SEND:
+                break
+        # 发表
+        await publish(cookie_path,dialogs)
         
         # 删除article里的图片和article_path文件
-        delete_article(article_path)
-        delete_img(img)
+        for article_path,img in zip([d["article_path"] for d in dialogs], [d["img"] for d in dialogs]):
+            delete_article(article_path)
+            delete_img(img)
 
         print("-->账号[%s]作品已成功发布" % author)
 
-asyncio.run(main())
+# asyncio.run(main())

@@ -1,7 +1,7 @@
 # 从今日热榜抓数据
 from playwright.async_api import Playwright, async_playwright
 import asyncio
-import package_base
+from . import package_base
 import sys
 import os
 sys.path.append(os.getcwd())
@@ -46,7 +46,7 @@ async def fetch_news_from_site(url, output_filename, folder_name, get_child_elem
         
         # 打印和保存数据
         print(datas)
-        package_base.write_to_txt(datas, output_filename, second_folder_name=folder_name)
+        package_base.write_to_txt(datas, output_filename, second_folder_name=folder_name,max_num=MAX_NUM_PER_SEND)
         print(f"已从{url}获取[{len(datas)}]条新闻，放入文件夹：[{folder_name}]下，文件名为：[{output_filename}]")
         
         # 清理资源

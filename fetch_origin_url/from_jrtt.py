@@ -4,7 +4,8 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))  # 添加项目根目录到sys.path
 from const import *
 import asyncio
-from package_base import *
+from . import package_base
+from .package_base import *
 
 base_url = "https://www.toutiao.com/?channel="
 
@@ -30,7 +31,7 @@ async def get_data(page):
 
 async def deal(page,area):
     datas = await get_data(page)
-    write_to_txt(datas,f'toutiao_{area}.txt',area)
+    write_to_txt(datas,f'toutiao_{area}.txt',second_folder_name = area,max_num = MAX_NUM_PER_SEND)
 
 
 async def goto_page(area):

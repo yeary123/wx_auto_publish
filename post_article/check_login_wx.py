@@ -6,7 +6,8 @@ sys.path.append(os.getcwd())
 from base.logs import config_log
 import post_article.get_wx_cookie as get_wx_cookie
 import const
-from assets import *
+from . import assets
+from .assets import *
 
   
 def delete_all_files(folder_path):
@@ -85,7 +86,7 @@ def find_file(path, file_type) -> list:
     return data_list
 
 async def check_log_state():
-    print("开始检查微信公众号账号登录情况")
+    print("-->开始检查微信公众号账号登录情况")
     cookie_list = find_cookie('wx_cookie')
     # 没有cookie文件
     if len(cookie_list) == 0:
@@ -93,9 +94,9 @@ async def check_log_state():
         await get_wx_cookie.main()
         cookie_list = find_cookie('wx_cookie')
         if len(cookie_list) > 0:
-            print("已有[%s]个账号成功登陆" % len(cookie_list))
+            print("-->已有[%s]个账号成功登陆" % len(cookie_list))
         else:
-            print("没有登录账号，程序退出")
+            print("-->没有登录账号，程序退出")
             exit()
     else:# 有cookie文件，查看登陆状态
         for index,cookie_path in enumerate(cookie_list):
@@ -119,9 +120,9 @@ async def check_log_state():
                 continue
         cookie_list = find_cookie('wx_cookie')
         if len(cookie_list) > 0:
-            print("已有[%s]个账号成功登陆" % len(cookie_list))
+            print("-->已有[%s]个账号成功登陆" % len(cookie_list))
         else:
-            print("没有登录账号，程序退出")
+            print("-->没有登录账号，程序退出")
             exit()
 
 # asyncio.run(check_log_state())

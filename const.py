@@ -35,3 +35,6 @@ author_and_type = {
     '在花': SPORTS,
     '李十一': HISTORY,
 }
+
+# 每次发布的数量
+MAX_NUM_PER_SEND = 3

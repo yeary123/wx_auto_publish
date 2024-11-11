@@ -55,15 +55,15 @@ class creator_wx():
             await self.__cookie(playwright)
 
 
-def main():
+async def main():
     while True:
         email = input('请输入账户名：')
         if email == "exit":
             break
         else:
             app = creator_wx(email, 60)
-            asyncio.run(app.main())
+            await app.main()
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#    asyncio.run(main())
  

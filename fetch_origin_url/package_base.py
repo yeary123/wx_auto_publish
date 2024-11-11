@@ -28,7 +28,10 @@ def delete_all_folders_and_files(folder_path):
         print('Error deleting files:', e)
 
 
-def write_to_txt(data, filename, second_folder_name = '', url_filter = ''):  
+def write_to_txt(data, filename, second_folder_name = '', url_filter = '',max_num = -1):  
+    # 只保留前max_num个数据
+    if max_num > 0 and len(data) > max_num:
+        data = data[:max_num]
     path = os.path.join(os.path.abspath("") , 'origin_data')
     if second_folder_name != '':
         path = os.path.join(path, second_folder_name)
