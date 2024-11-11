@@ -1,6 +1,7 @@
 import os
 import sys
 
+# 查找文件夹下所有文件
 def find_file(path, file_type) -> list:
     if not os.path.exists(path):
         os.makedirs(path)
@@ -19,7 +20,7 @@ def find_cookie(folder_name):
     path = os.path.join(current_directory, folder_name)
     return find_file(path, "json")
 
-def find_article():
+def find_article(type):
     father_path = os.path.abspath("")
-    path = os.path.join(father_path, 'json')
+    path = os.path.join(father_path, f'origin_data/{type}')
     return find_file(path, "json")

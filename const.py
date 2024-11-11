@@ -28,3 +28,10 @@ FOOD = "food"
 TRAVEL = "travel"
 HOT = "hot"
 ENTERTAINMENT = "entertainment"
+
+author_and_type = {
+    '小北': HOT,
+    '小蛙': HOT,
+    '在花': SPORTS,
+    '李十一': HISTORY,
+}

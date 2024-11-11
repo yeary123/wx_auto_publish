@@ -81,7 +81,7 @@ def read_txt_to_dict(file_path):
 def get_article_txt_img(url):
     try:
         with sync_playwright() as p:  
-            browser = p.chromium.launch(headless=True,
+            browser = p.chromium.launch(headless=False,
                                         chromium_sandbox=False,
                                             ignore_default_args=["--enable-automation"],
                                             channel="chrome")  # 你可以设置为 headless=True 以在无头模式下运行  
@@ -96,6 +96,7 @@ def get_article_txt_img(url):
             except Exception as e:
                 print(e)
             
+            parent_element_handle = None
             # 如果url包含 www.163.com，则需要playwright找到特定元素
             toutiao_content_selector = '#root > div.article-detail-container > div.main > div:nth-child(1) > div > div > div > div > article'
             if 'www.163.com' in url:
