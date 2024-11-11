@@ -52,9 +52,7 @@ async def goto_page(area):
         # 关掉浏览器
         await browser.close()
 
-async def from_jrtt():
-    categories = [MILITARY, FINANCE, TECH, SPORTS, HISTORY, FOOD, TRAVEL, HOT, ENTERTAINMENT]
+async def from_jrtt(categories):
     tasks = [goto_page(area) for area in categories]
-    await asyncio.gather(*tasks)
-    
-# asyncio.run(main())
+    for task in tasks:
+        await task 

@@ -102,6 +102,7 @@ async def publish(cookie_file,dialogs) -> str:
             time.sleep(1)
             # 填写正文（光标focus在正文部分）
             await new_page.keyboard.press('Tab') 
+            await new_page.click('#ueditor_0')
             #   在开头插入图片 上传
             upload_pic = await new_page.wait_for_selector('#js_editor_insertimage')
             await upload_pic.click()

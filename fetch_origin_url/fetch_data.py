@@ -21,7 +21,9 @@ def fetch_data():
     print("从澎湃获取数据")
     asyncio.run(from_pengpai())
     print("从今日头条获取数据")
-    asyncio.run(from_jrtt())
+    # categories = [MILITARY, FINANCE, TECH, SPORTS, HISTORY, FOOD, TRAVEL, HOT, ENTERTAINMENT]
+    categories = [HISTORY,SPORTS]
+    asyncio.run(from_jrtt(categories))
     print("-->获取数据完成")
     
 # fetch_data()
