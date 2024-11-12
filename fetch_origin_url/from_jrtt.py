@@ -86,4 +86,4 @@ async def from_jrtt(categories):
     for task in tasks:
         await task 
 
-asyncio.run(from_jrtt([HISTORY]))
+# asyncio.run(from_jrtt([HISTORY]))
