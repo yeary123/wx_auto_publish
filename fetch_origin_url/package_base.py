@@ -53,7 +53,8 @@ def write_to_txt(data, filename, second_folder_name = '', url_filter = '',max_nu
                     'hrefs' : []
                 }
             else:
-                if today['time'] == datetime.now().strftime("%Y-%m-%d"):
+                # 如果时间和当前时间差距小于30天
+                if (datetime.now() - datetime.strptime(today['time'], '%Y-%m-%d')).days < 30:
                     pass
                 else:
                     today = {
