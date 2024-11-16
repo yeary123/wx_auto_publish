@@ -37,4 +37,4 @@ author_and_type = {
 }
 
 # 每次发布的数量
-MAX_NUM_PER_SEND = 3
+MAX_NUM_PER_SEND = 1
