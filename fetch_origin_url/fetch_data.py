@@ -18,8 +18,8 @@ def fetch_data():
     # asyncio.run(from_36ke())
     # print("从it之家数据")
     # asyncio.run(from_itzhijia())
-    # print("从澎湃获取数据")
-    # asyncio.run(from_pengpai())
+    print("从澎湃获取数据")
+    asyncio.run(from_pengpai())
     # print("从今日头条获取数据")
     # categories = [MILITARY, FINANCE, TECH, SPORTS, HISTORY, FOOD, TRAVEL, HOT, ENTERTAINMENT]
     # categories = [HISTORY,SPORTS]
